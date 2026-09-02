@@ -1,7 +1,16 @@
 {{ config(materialized='view') }}
 
 WITH source AS (
+    -- One row per tpnc. A Batch-level retry re-fetches the tpncs that were left
+    -- out of the checkpoint (transient 429/5xx failures — see
+    -- docs/tesco-429-incident.md), so the same tpnc can land in two batch files
+    -- for one run_date: keep the best record (one with product data, then one
+    -- without an error) so the `unique` test on id still holds.
     SELECT * FROM {{ source('external_source', 'tesco') }}
+    QUALIFY row_number() OVER (
+        PARTITION BY tpnc
+        ORDER BY (data IS NOT NULL) DESC, (error IS NULL) DESC
+    ) = 1
 )
 
 SELECT

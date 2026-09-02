@@ -34,17 +34,28 @@ Two-stage pipeline per retailer:
 1. **ID script** (`*_ids.py`) — discovers product IDs, writes to `s3://ie-supermarket-data/raw/{retailer}/ids/date={YYYY-MM-DD}/` and overwrites `raw/{retailer}/ids/latest/{retailer}_product_ids.parquet`
 2. **API script** (`*_api.py`) — reads IDs from `latest/`, splits across `TOTAL_CHUNKS` by `CHUNK_ID`, writes gzipped JSONL batches to `raw/{retailer}/{YYYY-MM-DD}/`
 
-To test an API script locally on a small subset:
+To test an API script locally on a small subset, run it from the retailer dir (the
+scripts open sibling files like `graphql_query.txt` by relative path):
 ```bash
-CHUNK_ID=0 TOTAL_CHUNKS=200 uv run python tesco/tesco_api.py
+cd tesco && CHUNK_ID=0 TOTAL_CHUNKS=200 uv run python tesco_api.py
 ```
+
+`tesco_api.py` has extra env knobs (all optional) for rate-limit tuning and safe
+smoke tests — see the header of that file and `docs/tesco-429-incident.md`:
+`TESCO_TARGET_RPS` (aggregate req/s across all chunks, default 2.0),
+`TESCO_CONCURRENCY`, `TESCO_MAX_ATTEMPTS`, `TESCO_MAX_PRODUCTS` (cap the run),
+`TESCO_OUTPUT_PREFIX` (redirect S3 output away from the production `raw/tesco/` partition).
 
 ## AWS
 
 **S3 bucket**: `ie-supermarket-data` (eu-west-1)
 
 **Batch job definitions**:
-- `ie_supermarket_batch_job_definition` — scraper image (playwright, all API scripts)
+- `ie_supermarket_batch_job_definition` — scraper image (playwright, all API scripts).
+  `attemptDurationSeconds` is **12000** (rev 38+); a compliant Tesco pass at ~2 req/s
+  aggregate takes ~166 min. CI preserves the timeout because `aws.yml` only patches
+  `.containerProperties.image`, but it re-registers off `jobDefinitions[0]`, so keep the
+  newest revision as the one carrying the 12000s timeout.
 - `ie_supermarket_ids_job_definition` — lightweight IDs image (aldi only)
 
 **Job queue**: `getting-started-fargate-job-queue`
