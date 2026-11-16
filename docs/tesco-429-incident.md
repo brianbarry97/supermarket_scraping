@@ -1,11 +1,16 @@
 # Tesco scraper — Akamai rate-limiting incident (2026-08-09 onward)
 
-**Status:** fixes 1–5, 7 implemented 2026-09-02 (branch `tesco-429-fix`). See
-[§7 Resolution](#7-resolution-2026-09-02) for what shipped, what was verified, and the
-remaining follow-ups (backfill + `scd_product_prices` rebuild).
+**Update 2026-10-28:** the Tesco scraper has since moved onto `scraper_common/` with request pacing, backoff
+and a data-quality gate (see `docs/scraper_data_quality.md`), and the chunk run summaries for 2026-10-22
+to 2026-10-26 report every chunk `ok`. Whether the underlying Akamai rate control is lifted or just
+respected is not re-investigated here. The rest of this document is the original analysis and is kept
+as history.
+
+**Original status:** open, unfixed as of 2026-09-02. Not yet triaged into a work item — this document
+exists so a fresh session can pick it up with full context.
 
 **Scope note:** discovered while auditing category data for the SuperValu taxonomy consolidation.
-It is a separate workstream.
+It is a separate workstream and none of the fixes below have been implemented.
 
 ---
 
@@ -215,110 +220,5 @@ tpnc that 429'd.
 
 ---
 
-## 7. Resolution (2026-09-02)
-
-Branch `tesco-429-fix`. Fixes **1, 2, 3, 4, 5, 7** from §5 shipped; **6** (backfill) and the
-`scd_product_prices` rebuild are deferred follow-ups.
-
-### What changed
-
-`tesco/tesco_api.py` — rewritten `fetch_product` / `fetch_all_products`:
-
-1. **Retry with backoff, honouring `Retry-After`** (§5.1). Every request runs a bounded
-   `for attempt in range(TESCO_MAX_ATTEMPTS)` (default 6) loop: on HTTP 429 it reads
-   `Retry-After` and sleeps `retry_after * 2**attempt + jitter` (capped 60 s); HTTP 5xx and
-   `aiohttp`/timeout errors back off the same way from a 1 s base.
-2. **Body-level rejection detection** (§5.2). `_classify_200` inspects `data[0]`:
-   - `errors[0].extensions.http.status == 429` or a "too many requests"/rate/throttle message
-     → **ratelimit**: retried in-loop, and if it survives all attempts, left uncheckpointed
-     for a Batch-level retry (this is the §3 silent-empty mode).
-   - `"product-not-found"` message → **absent** (`data: null, error: null`) — a stale ID, same
-     class as SuperValu/Dunnes' `'Not found in any store'`, deliberately *not* counted as an
-     error so it neither trips the monitor nor gets retried forever.
-   - `extensions.http.status` 5xx or a transient message ("operation was aborted", …) →
-     **transient**: retried in-loop, but a permanent failure if it persists (re-running the
-     container won't help — so it does *not* keep the checkpoint).
-   - any other GraphQL error → **error**, surfaced immediately.
-   - `data` key present → **ok** (`data.product` may still be `null` = legitimately absent).
-   The "Success / Failed" counters are replaced by `ok / absent / failed` which sum to the
-   batch size by construction — the §3 "neither success nor failure" gap is closed.
-3. **Global pacing** (§5.3). A shared `RatePacer` gates every request *start* (first attempt
-   and every retry) to `TESCO_TARGET_RPS / TOTAL_CHUNKS` — default **2.0 / 5 = 0.4 req/s per
-   container, ~2.0 req/s aggregate**, evenly spaced with ±15% jitter. `CONCURRENT_REQUESTS`
-   (default 6) is now just a connection bound, not the rate control — it only needs to be
-   ≥ `per-container rps × request latency` (~2.5 s for a full PDP response) so a slow response
-   can't drag the effective rate below the pacer target; it never bursts because the pacer
-   still spaces every start. `TOTAL_CHUNKS` stays 5 (no `lambda/handler.py` change). The
-   session also gets a `TCPConnector` limit and a `ClientTimeout` (previously neither).
-4. **Batch timeout** (§5.4). `ie_supermarket_batch_job_definition` **rev 38** registered with
-   `attemptDurationSeconds` **12000** (was 7200). Estimated compliant full pass, per container:
-   3,990 products × 2.5 s pacer interval + 40 × 2 s batch delay + tail ≈ **10,100 s (~168 min)**
-   — ~16% headroom under 12,000 s. If production runs ever time out near completion, re-register
-   with 14,400 s. CI (`aws.yml`) only patches `.containerProperties.image`, so it preserves the
-   timeout — but it re-registers off `describe-job-definitions ... jobDefinitions[0]`, so the
-   newest revision must stay the one carrying 12000 s.
-5. **Checkpoint no longer poisons retries** (§5.5). Each result carries a `retryable` flag;
-   `processed_ids` is extended only with settled tpncs (`ok` / `absent` / permanent error).
-   A transient failure that exhausts all attempts is left out of the checkpoint and the
-   checkpoint is *kept* (not deleted) at end-of-run, so the Batch retry (`attempts: 2`)
-   resumes on exactly those tpncs.
-   - Because a Batch retry can then write a second record for a tpnc in the same `run_date`,
-     **`stg_tesco` now de-dupes** with `QUALIFY row_number() OVER (PARTITION BY tpnc ORDER BY
-     (data IS NOT NULL) DESC, (error IS NULL) DESC) = 1)` — keeps the best record, preserves
-     the `unique(id)` test.
-7. **Alerting** (§5.7). `dbt/tests/assert_scrape_error_rate.sql` (severity `warn`) fails the
-   daily build if any retailer's non-stale error rate ≥ 5%. Would have caught this on day one.
-
-New env knobs on `tesco_api.py`, all optional: `TESCO_TARGET_RPS`, `TESCO_CONCURRENCY`,
-`TESCO_MAX_ATTEMPTS`, `TESCO_MAX_PRODUCTS` (cap a run), `TESCO_OUTPUT_PREFIX` (redirect S3
-output away from the production `raw/tesco/` partition — used by both smoke tests).
-
-### Verification
-
-All runs 2026-09-02, `TESCO_OUTPUT_PREFIX` pointed at `s3://ie-supermarket-data/smoketest/`.
-
-| run | where | `CONCURRENCY` | rate | requests | ok | absent | HTTP 429 | other failed | retryable |
-|---|---|---|---|---|---|---|---|---|---|
-| local | residential IP, `TOTAL_CHUNKS=1` | 3 | 2.0 req/s target (~1 actual) | 3,000 | 2,999 | 1 | **0** | 0 | 0 |
-| local | residential IP, `TOTAL_CHUNKS=1` | 3 | 2.0 req/s target (~1 actual) | 1,500 | 1,499 | 1 | **0** | 0 | 0 |
-| **AWS Batch** | **5 Fargate containers, concurrent** | 3 | **0.4 req/s each = ~2.0 aggregate** | 3,100¹ | 3,097 | 1 | **0** | 2 | 0 |
-| local | residential IP, `TOTAL_CHUNKS=1` | **6** (shipped default) | 2.0 req/s target (1.69 actual) | 400 | 399 | 1 | **0** | 0 | 0 |
-
-¹ 3,000 planned + 100 re-fetched when chunk 2's container resumed from checkpoint (`MAX_PRODUCTS`
-slices *after* the checkpoint filter — a smoke-test-only artifact; production has no cap).
-
-- **Zero HTTP 429 and zero body-level rate-limit rejections** in ~7,900 requests total, against
-  the ~70% loss the unpatched scraper still sees. The AWS run is decisive: 5 containers hitting
-  `xapi.tesco.com` simultaneously from datacenter IPs at ~2.0 req/s aggregate drew no throttling,
-  so the §2/§6 per-IP-vs-per-API-key question doesn't block the fix — 2.0 req/s aggregate is
-  under the budget either way.
-- The AWS run used `CONCURRENCY=3` (the value at the time); the shipped default is 6. At the
-  production per-container rate of 0.4 req/s the in-flight count never approaches either value,
-  so 6 is inert there — it only matters for higher `TESCO_TARGET_RPS` or `TOTAL_CHUNKS=1`, and
-  the 400-request conc-6 local run confirms it still doesn't burst or draw 429s.
-- **Batch-file size canary** (§7.7 / §1): AWS smoke batches averaged **119.4 KiB / 100 records**,
-  matching the healthy 123.9 KiB baseline (rate-limited batches were 40.4 KiB).
-- The 2 "other failed" were `"The operation was aborted"` — a transient Tesco-backend GraphQL
-  error, 0.06%. The final classifier retries these in-loop (`_TRANSIENT_MARKERS`) and only
-  records a failure if it survives all 6 attempts; it does not keep the checkpoint for them.
-- **Checkpoint / Batch-retry path exercised for real**: AWS chunk 2's container was interrupted
-  once, relaunched, logged `Resuming from checkpoint: 100 already processed`, and completed
-  without re-fetching the first 100 — the §7.5 mechanism works end to end.
-- `stg_tesco`'s new de-dupe verified against a real partition doubled onto itself: 39,904 raw
-  rows → 19,952 out, one per tpnc.
-
-### Deferred follow-ups
-
-- **Backfill 2026-08-09 → present** at the compliant rate (§5.6). Not done here.
-- **`scd_product_prices`** has wrong change-dates for the whole outage window (§4); may warrant
-  a rebuild from backfilled raw partitions. Not done here.
-- **Per-IP vs per-API-key** (§2, §6) — the AWS smoke test result below is the first datapoint;
-  if it shows 0 rejections at 2.0 req/s aggregate, `TESCO_TARGET_RPS` can likely be raised
-  later, but conservative is correct until the daily production runs confirm it.
-- The `ie_supermarket_tesco429_smoketest` job definition and `s3://ie-supermarket-data/smoketest/`
-  prefix are test scaffolding — safe to leave, or clean up.
-
----
-
 *Investigation: 2026-09-02, all 103 Tesco date partitions swept + live reproduction from a
-residential IP. Fix: 2026-09-02, branch `tesco-429-fix`.*
+residential IP.*
