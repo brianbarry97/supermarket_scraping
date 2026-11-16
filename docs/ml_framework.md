@@ -39,6 +39,10 @@ uv run python -m ml_common.cli.images fetch --store ./embedding_store --catalogu
 
 S3 stays the source of truth for scraped and dbt data. The store is the working area for derived artefacts.
 
+## Pair scoring (`ml_common/pairs.py`, `cli/score.py`)
+
+The embedding idea applied to pairs: a cross-encoder (`PairScorerSpec`, registry `bge-reranker-v2-m3`, pinned revision) scores candidate product pairs once. dbt writes `candidates.parquet` (`int_match_candidates`); `run_score` scores the pairs whose `pair_key` (sha256 of the two texts the model sees) has no `ok` row and appends `scores/<scorer_id>/part-*.parquet` (`pair_key, text_a, text_b, score, status, error, scorer_id, scored_at`) plus a manifest. `scorer_id` hashes `model_id, revision, max_length`. Error rows are retried. About 77 pairs/s on the M-series Mac (MPS). The CLI takes `--store` (the dbt var `matching_prefix`, or env `MATCHING_STORE`), reads `candidates.parquet` from it and writes the scores beside it. See `dbt/README.md` (Product matching).
+
 ## Spec, content key, idempotency
 
 - `EmbeddingSpec` hashes `model_id, revision, modality, text_field, image_field, prefix, normalize, dim, dtype, image_tokens` into `spec_id`. Name, batch size, query prefix, device-loading options and the dbt layout flag are operational and do not change the id. A different id is a different table, so models and settings never mix.

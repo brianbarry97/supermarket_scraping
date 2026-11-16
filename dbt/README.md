@@ -65,6 +65,21 @@ ORDER BY sim DESC LIMIT 10;
 
 The scheduled Batch job runs a plain `dbt build`; it needs `--exclude tag:embeddings` (or the store prefix present) until the embeddings models are wanted there. The unit test uses only primitive columns because Fusion unit tests reject `LIST` columns.
 
+## Product matching (`models/matching/`, tags `matching` + `embeddings`)
+
+Which product in another retailer is the same as this one. Three steps, because the scorer is Python:
+
+```
+fct_product_listings + emb_gemma2_text -> int_match_candidates  (external: {matching_prefix}/candidates.parquet)
+python -m ml_common.cli.score --scorer bge-reranker-v2-m3 --store {matching_prefix}   (appends scores/<scorer_id>/part-*.parquet)
+stg_match_scores (view over the scores) -> fct_product_matches (table)
+```
+
+- `int_match_candidates`: a pair is a candidate only when the size agrees **exactly** (same `unit_normalised`, same `unit_qty_normalised` to 3 decimals) and the brands are equal (`same_brand`) or differ with at least one side an own-brand line (`own_brand`). Each product keeps its top 5 (`same_brand`) / 3 (`own_brand`) candidates per other retailer by cosine of the stored `gemma2-text` embeddings (cosine floor 0.75 for both; the first prototype used 0.85 for `own_brand`, which dropped the Dunnes own-brand ketchup, cosine 0.81, because its embedded title carries the long retailer prefix). Only embeddings whose `content_key` is the sha256 of the current `title_cleaned` are used. `match_text` is the title minus its brand prefix, so brand agreement is settled in SQL and the cross-encoder judges product type and variant.
+- Scores are cached by `pair_key` = sha256(text_a || chr(10) || text_b) (`ml_common.pairs.pair_key`), so an unchanged pair is never rescored and a changed title rescores only its own pairs. `match_scorer_id` (dbt var) must equal the scorer's `scorer_id` (printed by the CLI); changing the model, revision or `max_length` gives a new id and a new table.
+- `fct_product_matches`: pairs scoring at least `match_min_score` (0.95), in both directions. `match_type` is `exact` (same brand) or `own_brand_equivalent` (a substitute such as a Dunnes Stores ketchup and a Chef ketchup). `match_rank` orders a product's matches per other retailer and type; `is_mutual` marks pairs that are each other's rank 1. Use `match_rank = 1 AND is_mutual` for one-to-one links. `is_own_brand` is NULL for Tesco and Aldi, so `own_brand_equivalent` matches only involve SuperValu and Dunnes lines today.
+- The `embeddings` tag keeps these out of the scheduled Batch job, which has no scores store. Test with a local store: `--vars '{matching_prefix: /abs/dir}'` and `MATCHING_STORE`/`--store` the same dir; build with `-s int_match_candidates` and later `-s stg_match_scores fct_product_matches` (never `+`).
+
 ## Own-brand flag (`is_own_brand`)
 
 Dunnes and SuperValu expose it in the raw payload (`OwnBrand` / `own brand`, kept as is, noisy as it is). Tesco and Aldi do not, so `macros/own_brand.sql` derives it, and the `own_brand_overrides` seed (`supermarket, brand, is_own_brand, source`; brands normalised as in `int_*`) overrides the rules for any retailer:

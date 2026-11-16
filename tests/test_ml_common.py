@@ -355,3 +355,71 @@ def test_latest_ok_keeps_every_vector_of_the_newest_embedding_only():
         ("a", 1, t1),
         ("b", 0, t0),
     ]
+
+
+# --- pair scoring (ml_common.pairs) ---------------------------------------------------------------
+
+from ml_common import pairs  # noqa: E402
+
+
+class FakeScorer:
+    """Score = 1.0 for identical texts, else 0.25; the pair containing 'FAIL' errors."""
+
+    def __init__(self):
+        self.calls: list[tuple[str, str]] = []
+
+    def score(self, batch):
+        self.calls.extend(batch)
+        return [
+            pairs.ScoreResult(None, "boom")
+            if "FAIL" in (a, b)
+            else pairs.ScoreResult(1.0 if a == b else 0.25)
+            for a, b in batch
+        ]
+
+
+def _candidates(*texts):
+    return pl.DataFrame({"text_a": [a for a, _ in texts], "text_b": [b for _, b in texts]})
+
+
+def test_pair_key_matches_duckdb_sql():
+    import duckdb
+
+    sql = duckdb.sql("select sha256('red beans' || chr(10) || 'beans red')").fetchall()[0][0]
+    assert sql == pairs.pair_key("red beans", "beans red")
+
+
+def test_scorer_id_ignores_operational_fields_but_not_the_model():
+    spec = pairs.get_scorer_spec("bge-reranker-v2-m3")
+    assert replace(spec, name="x", batch_size=1).scorer_id == spec.scorer_id
+    assert replace(spec, revision="0" * 40).scorer_id != spec.scorer_id
+    assert replace(spec, max_length=64).scorer_id != spec.scorer_id
+
+
+def test_run_score_is_incremental(tmp_path):
+    spec = pairs.get_scorer_spec("bge-reranker-v2-m3")
+    storage = Storage(str(tmp_path))
+    first = _candidates(("a", "a"), ("a", "b"), ("a", "a"))  # duplicate pair scores once
+    scorer = FakeScorer()
+    summary = pairs.run_score(spec, first, storage, scorer)
+    assert (summary.pending, summary.scored, summary.failed) == (2, 2, 0)
+
+    again = FakeScorer()
+    assert pairs.run_score(spec, first, storage, again).pending == 0
+    assert again.calls == []
+
+    grown = pl.concat([first, _candidates(("c", "c"))])  # only the new pair is scored
+    third = FakeScorer()
+    assert pairs.run_score(spec, grown, storage, third).scored == 1
+    assert third.calls == [("c", "c")]
+    assert (tmp_path / spec.table_prefix / "manifest.json").exists()
+
+
+def test_failed_pairs_are_retried_not_marked_done(tmp_path):
+    spec = pairs.get_scorer_spec("bge-reranker-v2-m3")
+    storage = Storage(str(tmp_path))
+    cands = _candidates(("FAIL", "x"), ("a", "a"))
+    assert pairs.run_score(spec, cands, storage, FakeScorer()).failed == 1
+    retry = FakeScorer()
+    pairs.run_score(spec, cands, storage, retry)
+    assert retry.calls == [("FAIL", "x")]

@@ -46,6 +46,18 @@ vars:
   # key -> {spec_id, dim}. dim must equal the stored vector length (assert_embedding_dims checks it).
   embedding_specs:
     gemma2_text: {spec_id: "268dad232ccc02bc", dim: 768}
+  # Cross-retailer product matching (models/matching/). dbt writes {matching_prefix}/candidates.parquet
+  # (int_match_candidates); `python -m ml_common.cli.score --scorer bge-reranker-v2-m3 --store
+  # <matching_prefix>` appends scores/<scorer_id>/part-*.parquet; fct_product_matches applies
+  # match_min_score. match_scorer_id must equal PairScorerSpec.scorer_id of the scorer used.
+  # Override matching_prefix with a local dir when testing so production S3 is not touched.
+  matching_prefix: "s3://ie-supermarket-data/ml/matching"
+  match_scorer_id: "aaf2571ef1c984c4"
+  match_min_score: 0.95
+  # Retailer sub-line names that prefix own-brand titles after the brand ("dunnes stores simply
+  # better ..."). Stripped from the text the cross-encoder compares; derived from the catalogue's
+  # most frequent own-brand title prefixes. Lower case, as in title_cleaned.
+  own_brand_lines: [simply better, my family favourites, my family favorites, baking at home, signature tastes]
 
 models:
   dbt_ie_supermarket_analytics:
@@ -68,6 +80,11 @@ models:
       +materialized: table
       +tags: ["embeddings"]
 
+    # Reads emb_* and a store the Batch job does not have, so it carries the embeddings tag the
+    # job excludes (run_dbt.py) as well as its own.
+    matching:
+      +materialized: table
+      +tags: ["matching", "embeddings"]
 
 flags:
   require_generic_test_arguments_property: true

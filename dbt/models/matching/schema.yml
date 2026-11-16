@@ -1,0 +1,79 @@
+version: 2
+
+models:
+  - name: int_match_candidates
+    description: >
+      Candidate product pairs across retailers for the cross-encoder (ml_common.cli.score), written
+      to {matching_prefix}/candidates.parquet. Exact size agreement is required (same
+      unit_normalised and unit_qty_normalised to 3 decimals), plus same brand or an own-brand line
+      on one side. Pairs are stored once, supermarket_a < supermarket_b.
+    data_tests:
+      - unique_combination:
+          arguments:
+            columns: [supermarket_a, id_a, supermarket_b, id_b]
+    columns:
+      - name: pair_key
+        description: sha256(text_a || chr(10) || text_b); the key of the cached cross-encoder score (ml_common.pairs.pair_key).
+        data_tests: [not_null]
+      - name: pair_kind
+        description: "same_brand, or own_brand (different brands, at least one an own-brand line)."
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['same_brand', 'own_brand']
+      - name: cosine
+        description: Cosine similarity of the stored gemma2-text title embeddings.
+      - name: text_a
+        description: Title of product a without its brand prefix; the text the cross-encoder sees.
+      - name: text_b
+        description: Title of product b without its brand prefix.
+
+  - name: stg_match_scores
+    description: Cached cross-encoder scores (0 to 1) per pair_key, newest successful score wins.
+    columns:
+      - name: pair_key
+        data_tests: [unique, not_null]
+      - name: score
+        data_tests:
+          - accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 1
+
+  - name: fct_product_matches
+    description: >
+      Cross-retailer product matches, one row per (product, matched product), in both directions.
+      `exact` is the same product (same brand, same size, cross-encoder score >= match_min_score);
+      `own_brand_equivalent` is a substitute for an own-brand line (different brands). Filter
+      match_rank = 1 AND is_mutual for one-to-one links.
+    data_tests:
+      - unique_combination:
+          arguments:
+            columns: [supermarket, id, match_supermarket, match_id]
+    columns:
+      - name: supermarket
+        data_tests: [not_null]
+      - name: id
+        data_tests: [not_null]
+      - name: match_supermarket
+        data_tests: [not_null]
+      - name: match_id
+        data_tests: [not_null]
+      - name: match_type
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['exact', 'own_brand_equivalent']
+      - name: match_rank
+        description: 1 is the best match of this type in that retailer, by score then cosine.
+      - name: is_mutual
+        description: The pair is each other's rank 1 of the same match_type.
+      - name: score
+        description: Cross-encoder score on the brand-stripped titles.
+        data_tests:
+          - accepted_range:
+              arguments:
+                min_value: "{{ var('match_min_score') }}"
+                max_value: 1
+      - name: cosine
+        description: Cosine similarity of the gemma2-text title embeddings.
