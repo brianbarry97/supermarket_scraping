@@ -67,3 +67,30 @@ seeds:
                 max_value: 1
       - name: reviewed_at
         description: When a human reviewed the override; NULL if unreviewed.
+
+  - name: own_brand_overrides
+    description: >
+      Per-retailer brand overrides for the own-brand flag (macros/own_brand.sql). is_own_brand = false lists a
+      third-party brand at Aldi (Aldi is otherwise own brand for every brand); a row for Tesco corrects the
+      Tesco rules (brand name, F&F, Tesco address). Brands are normalised (lowercase, no punctuation) as in
+      the int_* models.
+    data_tests:
+      - unique_combination:
+          arguments:
+            columns: [supermarket, brand]
+    columns:
+      - name: supermarket
+        description: Retailer the override applies to.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['tesco', 'aldi']
+      - name: brand
+        description: Brand as produced by normalize_text in the int_* models.
+        data_tests: [not_null]
+      - name: is_own_brand
+        description: The flag value to use for every product of this brand.
+        data_tests: [not_null]
+      - name: source
+        description: Where the row came from (auto-derived from other retailers, or a manual decision).

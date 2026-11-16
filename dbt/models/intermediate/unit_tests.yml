@@ -16,6 +16,10 @@ unit_tests:
           - {id: a10, supermarket: aldi, title: "Bare", selling_size: "100g", price_display: "€1.00", is_sale: false, ingredients: "Ingredients", is_product_available: true}
           - {id: a11, supermarket: aldi, title: "Mid", selling_size: "100g", price_display: "€1.00", is_sale: false, ingredients: "Oats, Ingredients: Salt", is_product_available: true}
           - {id: a3, supermarket: aldi, title: "Gone", selling_size: "1kg", price_display: "€1.00", is_sale: false, is_product_available: false}
+      - input: ref('own_brand_overrides')
+        format: sql
+        rows: |
+          SELECT CAST(NULL AS VARCHAR) AS supermarket, CAST(NULL AS VARCHAR) AS brand, CAST(NULL AS BOOLEAN) AS is_own_brand WHERE false
     expect:
       rows:
         - {id: a1, price: 1.99, was_price: 2.49, selling_size: 1.5, unit: l, unit_qty_normalised: 1.5, unit_normalised: l, price_per_unit_normalised: 1.33, is_discount: true, ingredients: null}
@@ -38,6 +42,10 @@ unit_tests:
           - {id: t1, supermarket: tesco, title: "Cola 330ml", quantity: 330, unit: ml, price: 2.0, promotion_price: 1.5, is_discount: true, is_promotion: false}
           - {id: t2, supermarket: tesco, title: "Beans 3 for 2", quantity: 400, unit: g, price: 1.0, promotion_price: 0.67, is_discount: false, is_promotion: true}
           - {id: t3, supermarket: tesco, title: "Low Fat Yogurt", quantity: 4, unit: pk, price: 2.0, is_discount: false, is_promotion: false}
+      - input: ref('own_brand_overrides')
+        format: sql
+        rows: |
+          SELECT CAST(NULL AS VARCHAR) AS supermarket, CAST(NULL AS VARCHAR) AS brand, CAST(NULL AS BOOLEAN) AS is_own_brand WHERE false
     expect:
       rows:
         - {id: t1, price: 1.5, was_price: 2.0, unit_qty_normalised: 0.33, unit_normalised: l, price_per_unit_normalised: 4.55}
@@ -76,6 +84,7 @@ unit_tests:
             CAST(NULL AS VARCHAR[]) AS item_description, i.ingredients,
             CAST(NULL AS STRUCT("name" VARCHAR, "values" VARCHAR[], __typename VARCHAR)[]) AS allergen_info,
             CAST(NULL AS VARCHAR[]) AS dietary_flags, CAST(NULL AS VARCHAR[]) AS certification_flags, CAST(NULL AS VARCHAR[]) AS nutritional_claims,
+            CAST(NULL AS BOOLEAN) AS has_tesco_address,
             CAST(NULL AS VARCHAR) AS image_url, true AS is_product_available, false AS is_discount, false AS is_promotion,
             CAST(NULL AS DATE) AS scraped_date
           FROM (VALUES
@@ -84,12 +93,91 @@ unit_tests:
             ('t3', ['Salt', 'Ingredients:' || chr(160) || 'Pepper', 'Vegetables in varying proportions: Carrot']),
             ('t4', ['Oats', 'Natural ingredients'])
           ) AS i(id, ingredients)
+      - input: ref('own_brand_overrides')
+        format: sql
+        rows: |
+          SELECT CAST(NULL AS VARCHAR) AS supermarket, CAST(NULL AS VARCHAR) AS brand, CAST(NULL AS BOOLEAN) AS is_own_brand WHERE false
     expect:
       rows:
         - {id: t1, ingredients: "Water, Vegetables (29%), Durum Wheat Semolina"}
         - {id: t2, ingredients: "Flour, Sugar"}
         - {id: t3, ingredients: "Salt, Pepper, Vegetables in varying proportions: Carrot"}
         - {id: t4, ingredients: "Oats, Natural ingredients"}
+
+  - name: int_tesco_own_brand_rules
+    description: >
+      Own brand is the Tesco brand name or F&F, or a brand at least half of whose products (and at least
+      three) name Tesco as returns/manufacturer address; the own_brand_overrides seed wins over both.
+    model: int_tesco
+    given:
+      - input: ref('stg_tesco')
+        format: sql
+        rows: |
+          SELECT
+            i.id, 'tesco' AS supermarket, CAST(NULL AS VARCHAR) AS title, i.brand,
+            CAST(1 AS FLOAT) AS quantity, 'sngl' AS unit, CAST(NULL AS DOUBLE) AS unit_price, CAST(NULL AS VARCHAR) AS unit_of_measure,
+            CAST(2.0 AS DOUBLE) AS price, CAST(NULL AS DOUBLE) AS promotion_price, CAST(NULL AS DOUBLE) AS price_before_discount,
+            CAST(NULL AS DOUBLE) AS price_after_discount, CAST(NULL AS DATE) AS promotion_start_date, CAST(NULL AS DATE) AS promotion_end_date,
+            CAST(NULL AS VARCHAR) AS promotion_description, CAST(NULL AS VARCHAR) AS promotion_type,
+            CAST(NULL AS VARCHAR) AS category_1, CAST(NULL AS VARCHAR) AS category_2, CAST(NULL AS VARCHAR) AS category_3, CAST(NULL AS VARCHAR) AS category_4,
+            CAST(NULL AS VARCHAR[]) AS item_description, CAST(NULL AS VARCHAR[]) AS ingredients,
+            CAST(NULL AS STRUCT("name" VARCHAR, "values" VARCHAR[], __typename VARCHAR)[]) AS allergen_info,
+            CAST(NULL AS VARCHAR[]) AS dietary_flags, CAST(NULL AS VARCHAR[]) AS certification_flags, CAST(NULL AS VARCHAR[]) AS nutritional_claims,
+            i.has_tesco_address,
+            CAST(NULL AS VARCHAR) AS image_url, true AS is_product_available, false AS is_discount, false AS is_promotion,
+            CAST(NULL AS DATE) AS scraped_date
+          FROM (VALUES
+            ('t1', 'TESCO Finest', false),
+            ('t2', 'F&F HOME', false),
+            ('g1', 'Go Cook', true), ('g2', 'Go Cook', true), ('g3', 'Go Cook', true), ('g4', 'Go Cook', false),
+            ('l1', 'Lego', true),
+            ('m1', 'Mixed Co', true), ('m2', 'Mixed Co', false), ('m3', 'Mixed Co', false),
+            ('p1', 'Paperchase', true), ('p2', 'Paperchase', true), ('p3', 'Paperchase', true),
+            ('c1', 'Cadbury', false)
+          ) AS i(id, brand, has_tesco_address)
+      - input: ref('own_brand_overrides')
+        rows:
+          - {supermarket: tesco, brand: paperchase, is_own_brand: false}
+          - {supermarket: aldi, brand: cadbury, is_own_brand: true}
+    expect:
+      rows:
+        - {id: t1, is_own_brand: true}
+        - {id: t2, is_own_brand: true}
+        - {id: g1, is_own_brand: true}
+        - {id: g2, is_own_brand: true}
+        - {id: g3, is_own_brand: true}
+        - {id: g4, is_own_brand: true}
+        - {id: l1, is_own_brand: false}
+        - {id: m1, is_own_brand: false}
+        - {id: m2, is_own_brand: false}
+        - {id: m3, is_own_brand: false}
+        - {id: p1, is_own_brand: false}
+        - {id: p2, is_own_brand: false}
+        - {id: p3, is_own_brand: false}
+        - {id: c1, is_own_brand: false}
+
+  - name: int_aldi_own_brand_rules
+    description: >
+      Every Aldi brand is own brand unless the own_brand_overrides seed lists it as third party; no brand is
+      unknown (NULL). A seed row for another retailer is ignored.
+    model: int_aldi
+    given:
+      - input: ref('stg_aldi')
+        rows:
+          - {id: o1, supermarket: aldi, title: "Maple Syrup", brand: "SPECIALLY SELECTED", selling_size: "250ml", price_display: "€3.00", is_sale: false, is_product_available: true}
+          - {id: o2, supermarket: aldi, title: "Kit Kat 4 Finger", brand: "KIT KAT", selling_size: "41.5g", price_display: "€1.00", is_sale: false, is_product_available: true}
+          - {id: o3, supermarket: aldi, title: "Paper Straws", selling_size: "50 Pack", price_display: "€1.00", is_sale: false, is_product_available: true}
+          - {id: o4, supermarket: aldi, title: "Cadbury Dairy Milk", brand: "CADBURY", selling_size: "110g", price_display: "€1.00", is_sale: false, is_product_available: true}
+      - input: ref('own_brand_overrides')
+        rows:
+          - {supermarket: aldi, brand: kit kat, is_own_brand: false}
+          - {supermarket: tesco, brand: cadbury, is_own_brand: false}
+    expect:
+      rows:
+        - {id: o1, is_own_brand: true}
+        - {id: o2, is_own_brand: false}
+        - {id: o3, is_own_brand: null}
+        - {id: o4, is_own_brand: true}
 
   - name: int_dunnes_parses_description_html
     description: Ingredients, allergen status (strictest wins on duplicates) and lifestyle tags are extracted from the description HTML.
@@ -124,6 +212,10 @@ unit_tests:
           - {id: c2, supermarket: tesco, title: "Baby Wipes 9 pack", quantity: 540, unit: sht, price: 20.0}
           - {id: c3, supermarket: tesco, title: "Tissues 9 pack", quantity: 9, unit: sht, price: 2.7}
           - {id: c4, supermarket: tesco, title: "Single Item", unit: sngl, price: 2.0}
+      - input: ref('own_brand_overrides')
+        format: sql
+        rows: |
+          SELECT CAST(NULL AS VARCHAR) AS supermarket, CAST(NULL AS VARCHAR) AS brand, CAST(NULL AS BOOLEAN) AS is_own_brand WHERE false
     expect:
       rows:
         - {id: c1, unit_qty_normalised: 100.0, unit_normalised: each, price_per_unit_normalised: 0.015}
@@ -156,6 +248,10 @@ unit_tests:
         rows:
           - {id: u1, supermarket: tesco, title: "El Yucateco Habanera 120 ml", quantity: 120, unit: ml, price: 2.75, promotion_price: 2.0, unit_price: 22.92, is_discount: true, is_promotion: false}
           - {id: u2, supermarket: tesco, title: "Beans 400g", quantity: 400, unit: g, price: 1.0, promotion_price: 0.67, unit_price: 2.5, is_discount: false, is_promotion: true}
+      - input: ref('own_brand_overrides')
+        format: sql
+        rows: |
+          SELECT CAST(NULL AS VARCHAR) AS supermarket, CAST(NULL AS VARCHAR) AS brand, CAST(NULL AS BOOLEAN) AS is_own_brand WHERE false
     expect:
       rows:
         - {id: u1, price: 2.0, was_price: 2.75, unit_price: 16.67, price_per_unit_normalised: 16.67}

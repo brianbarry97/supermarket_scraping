@@ -6,6 +6,9 @@ normalised AS (
     SELECT
         *,
         {{ normalize_text('title') }} AS title_norm,
+        {{ normalize_text('brand') }} AS brand_norm,
+        avg(has_tesco_address::INT) OVER (PARTITION BY {{ normalize_text('brand') }}) AS brand_address_share,
+        count(*) FILTER (WHERE has_tesco_address) OVER (PARTITION BY {{ normalize_text('brand') }}) AS brand_address_n,
         {{ unit_qty_normalised('unit', 'quantity', 'title_norm') }} AS unit_qty_normalised,
         {{ unit_normalised('unit') }} AS unit_normalised,
         -- price is the current effective price: only a price_cut discount lowers it. Multibuy
@@ -20,6 +23,15 @@ normalised AS (
              THEN ROUND(unit_price * promotion_price / NULLIF(price, 0), 2)
              ELSE unit_price END AS effective_unit_price
     FROM stg
+),
+
+-- seed row for this retailer and brand (seeds/own_brand_overrides) overrides the own-brand rule; joined in
+-- its own CTE so the seed's supermarket/brand columns cannot clash with the model's
+overridden AS (
+    SELECT normalised.*, brand_override.is_own_brand AS override_own_brand
+    FROM normalised
+    LEFT JOIN {{ ref('own_brand_overrides') }} AS brand_override
+        ON brand_override.supermarket = 'tesco' AND brand_override.brand = normalised.brand_norm
 )
 
 SELECT
@@ -27,8 +39,8 @@ SELECT
     supermarket::VARCHAR AS supermarket,
     title_norm::VARCHAR AS title,
     {{ clean_title('title') }} AS title_cleaned,
-    {{ normalize_text('brand') }}::VARCHAR AS brand,
-    CAST(NULL AS BOOLEAN) AS is_own_brand,
+    brand_norm::VARCHAR AS brand,
+    {{ tesco_is_own_brand('brand_norm', 'brand_address_share', 'brand_address_n', 'override_own_brand') }}::BOOLEAN AS is_own_brand,
     item_description::VARCHAR AS item_description,
     {{ normalize_category('category_1') }}::VARCHAR AS category_1,
     {{ normalize_category('category_2') }}::VARCHAR AS category_2,
@@ -97,4 +109,4 @@ SELECT
     image_url::VARCHAR AS image_url,
     is_product_available::BOOLEAN AS is_product_available,
     scraped_date::DATE AS scraped_date
-FROM normalised
+FROM overridden

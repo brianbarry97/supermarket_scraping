@@ -10,7 +10,7 @@
 
 {% docs col_brand %}Normalised brand name.{% enddocs %}
 
-{% docs col_is_own_brand %}TRUE for the retailer's own-label products. NULL where the retailer does not expose it (Tesco, Aldi).{% enddocs %}
+{% docs col_is_own_brand %}TRUE for the retailer's own-label products. Dunnes and SuperValu: the retailer's raw flag. Tesco: derived (brand is Tesco or F&F, or a Tesco-exclusive label recognised by the Tesco address in its returns/manufacturer details; see macro tesco_is_own_brand). Aldi: every brand unless the own_brand_overrides seed lists it as third party; NULL when the product has no brand. The seed overrides the rules for any retailer.{% enddocs %}
 
 {% docs col_item_description %}Product description as scraped. Dunnes descriptions contain HTML.{% enddocs %}
 

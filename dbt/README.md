@@ -65,6 +65,13 @@ ORDER BY sim DESC LIMIT 10;
 
 The scheduled Batch job runs a plain `dbt build`; it needs `--exclude tag:embeddings` (or the store prefix present) until the embeddings models are wanted there. The unit test uses only primitive columns because Fusion unit tests reject `LIST` columns.
 
+## Own-brand flag (`is_own_brand`)
+
+Dunnes and SuperValu expose it in the raw payload (`OwnBrand` / `own brand`, kept as is, noisy as it is). Tesco and Aldi do not, so `macros/own_brand.sql` derives it, and the `own_brand_overrides` seed (`supermarket, brand, is_own_brand, source`; brands normalised as in `int_*`) overrides the rules for any retailer:
+
+- **Tesco** (`tesco_is_own_brand`): brand is `tesco...` or `fandf...`, or a Tesco-exclusive label that does not say "Tesco" (Go Cook, Fred & Flo, Hearty Food Co, ...): at least half of the brand's products in the run, and at least three, name Tesco Stores/Ireland in `returnTo` or `manufacturer.addresses` (`stg_tesco.has_tesco_address`). Measured on the 2026-11-12 raw data: 4,783 products by name (795 of them F&F), 451 more by address across 28 brands. Third-party brands that sell through Tesco and carry its address (Paperchase, Slumberdown, Woodvale) are corrected with a seed row.
+- **Aldi** (`aldi_is_own_brand`): every brand is own unless the seed lists it as third party (`is_own_brand = false`); a product with no brand is NULL. The seed is seeded with the Aldi brands that Dunnes and SuperValu never flag as own (109 brands) and extended by hand.
+
 ## Product search (`models/search/`, tag `search`)
 
 `dim_product_search` is one row per `(supermarket, id)` from `fct_product_listings` (same run, same row count): title/brand/category/ingredient text, the dietary flags, allergens and basic price fields, plus a surrogate `product_key` (`supermarket || ':' || id`). It is the single table an agent or notebook filters and keyword-searches; it holds no embeddings (join `emb_<spec>` / `fct_embeddings` on `(supermarket, id)` at query time).

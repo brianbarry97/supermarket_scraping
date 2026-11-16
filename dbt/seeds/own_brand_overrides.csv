@@ -1,0 +1,111 @@
+supermarket,brand,is_own_brand,source
+aldi,acti snack,false,auto: never flagged own at Dunnes or SuperValu
+aldi,alka seltzer,false,auto: never flagged own at Dunnes or SuperValu
+aldi,always,false,auto: never flagged own at Dunnes or SuperValu
+aldi,andrex,false,auto: never flagged own at Dunnes or SuperValu
+aldi,aptamil,false,auto: never flagged own at Dunnes or SuperValu
+aldi,atlantic treasures,false,auto: never flagged own at Dunnes or SuperValu
+aldi,babybel,false,auto: never flagged own at Dunnes or SuperValu
+aldi,ballymaloe,false,auto: never flagged own at Dunnes or SuperValu
+aldi,barrys tea,false,auto: never flagged own at Dunnes or SuperValu
+aldi,batchelors,false,auto: never flagged own at Dunnes or SuperValu
+aldi,bens original,false,auto: never flagged own at Dunnes or SuperValu
+aldi,benylin,false,auto: never flagged own at Dunnes or SuperValu
+aldi,boursin,false,auto: never flagged own at Dunnes or SuperValu
+aldi,brennans,false,auto: never flagged own at Dunnes or SuperValu
+aldi,budweiser,false,auto: never flagged own at Dunnes or SuperValu
+aldi,bulmers,false,auto: never flagged own at Dunnes or SuperValu
+aldi,bundaberg,false,auto: never flagged own at Dunnes or SuperValu
+aldi,bushmills,false,auto: never flagged own at Dunnes or SuperValu
+aldi,cadbury,false,auto: never flagged own at Dunnes or SuperValu
+aldi,calpol,false,auto: never flagged own at Dunnes or SuperValu
+aldi,carlsberg,false,auto: never flagged own at Dunnes or SuperValu
+aldi,chicago town,false,auto: never flagged own at Dunnes or SuperValu
+aldi,clonakilty,false,auto: never flagged own at Dunnes or SuperValu
+aldi,club,false,auto: never flagged own at Dunnes or SuperValu
+aldi,coca cola,false,auto: never flagged own at Dunnes or SuperValu
+aldi,colgate,false,auto: never flagged own at Dunnes or SuperValu
+aldi,connacht gold,false,auto: never flagged own at Dunnes or SuperValu
+aldi,cookie do,false,auto: never flagged own at Dunnes or SuperValu
+aldi,coolmore,false,auto: never flagged own at Dunnes or SuperValu
+aldi,coors,false,auto: never flagged own at Dunnes or SuperValu
+aldi,corona,false,auto: never flagged own at Dunnes or SuperValu
+aldi,disney,false,auto: never flagged own at Dunnes or SuperValu
+aldi,dolmio,false,auto: never flagged own at Dunnes or SuperValu
+aldi,doritos,false,auto: never flagged own at Dunnes or SuperValu
+aldi,dove,false,auto: never flagged own at Dunnes or SuperValu
+aldi,duracell,false,auto: never flagged own at Dunnes or SuperValu
+aldi,elbow grease,false,auto: never flagged own at Dunnes or SuperValu
+aldi,elmlea,false,auto: never flagged own at Dunnes or SuperValu
+aldi,extra,false,auto: never flagged own at Dunnes or SuperValu
+aldi,fairy,false,auto: never flagged own at Dunnes or SuperValu
+aldi,fini,false,auto: never flagged own at Dunnes or SuperValu
+aldi,flahavans,false,auto: never flagged own at Dunnes or SuperValu
+aldi,forest feast,false,auto: never flagged own at Dunnes or SuperValu
+aldi,fridge raiders,false,auto: never flagged own at Dunnes or SuperValu
+aldi,galaxy,false,auto: never flagged own at Dunnes or SuperValu
+aldi,garnier,false,auto: never flagged own at Dunnes or SuperValu
+aldi,gaviscon,false,auto: never flagged own at Dunnes or SuperValu
+aldi,glenilen farm,false,auto: never flagged own at Dunnes or SuperValu
+aldi,glenisk,false,auto: never flagged own at Dunnes or SuperValu
+aldi,gordons,false,auto: never flagged own at Dunnes or SuperValu
+aldi,green isle,false,auto: never flagged own at Dunnes or SuperValu
+aldi,guinness,false,auto: never flagged own at Dunnes or SuperValu
+aldi,haribo,false,auto: never flagged own at Dunnes or SuperValu
+aldi,heineken,false,auto: never flagged own at Dunnes or SuperValu
+aldi,heinz,false,auto: never flagged own at Dunnes or SuperValu
+aldi,hellmanns,false,auto: never flagged own at Dunnes or SuperValu
+aldi,irish yogurts,false,auto: never flagged own at Dunnes or SuperValu
+aldi,jacobs,false,auto: never flagged own at Dunnes or SuperValu
+aldi,jameson,false,auto: never flagged own at Dunnes or SuperValu
+aldi,kelloggs,false,auto: never flagged own at Dunnes or SuperValu
+aldi,kerry,false,auto: never flagged own at Dunnes or SuperValu
+aldi,kerrygold,false,auto: never flagged own at Dunnes or SuperValu
+aldi,kinder,false,auto: never flagged own at Dunnes or SuperValu
+aldi,king,false,auto: never flagged own at Dunnes or SuperValu
+aldi,knorr,false,auto: never flagged own at Dunnes or SuperValu
+aldi,lemsip,false,auto: never flagged own at Dunnes or SuperValu
+aldi,liga,false,auto: never flagged own at Dunnes or SuperValu
+aldi,lucozade,false,auto: never flagged own at Dunnes or SuperValu
+aldi,maggi,false,auto: never flagged own at Dunnes or SuperValu
+aldi,maltesers,false,auto: never flagged own at Dunnes or SuperValu
+aldi,maoam,false,auto: never flagged own at Dunnes or SuperValu
+aldi,mars,false,auto: never flagged own at Dunnes or SuperValu
+aldi,maxwell house,false,auto: never flagged own at Dunnes or SuperValu
+aldi,mcguigan,false,auto: never flagged own at Dunnes or SuperValu
+aldi,monster energy,false,auto: never flagged own at Dunnes or SuperValu
+aldi,morning fresh,false,auto: never flagged own at Dunnes or SuperValu
+aldi,nestle,false,auto: never flagged own at Dunnes or SuperValu
+aldi,nutella,false,auto: never flagged own at Dunnes or SuperValu
+aldi,oishii sushi,false,auto: never flagged own at Dunnes or SuperValu
+aldi,panadol,false,auto: never flagged own at Dunnes or SuperValu
+aldi,paw patrol,false,auto: never flagged own at Dunnes or SuperValu
+aldi,peppa pig,false,auto: never flagged own at Dunnes or SuperValu
+aldi,pepsi,false,auto: never flagged own at Dunnes or SuperValu
+aldi,pringles,false,auto: never flagged own at Dunnes or SuperValu
+aldi,quality street,false,auto: never flagged own at Dunnes or SuperValu
+aldi,red bull,false,auto: never flagged own at Dunnes or SuperValu
+aldi,rennie,false,auto: never flagged own at Dunnes or SuperValu
+aldi,santa rita,false,auto: never flagged own at Dunnes or SuperValu
+aldi,sensodyne,false,auto: never flagged own at Dunnes or SuperValu
+aldi,simply fruit,false,auto: never flagged own at Dunnes or SuperValu
+aldi,skinny whip,false,auto: never flagged own at Dunnes or SuperValu
+aldi,skittles,false,auto: never flagged own at Dunnes or SuperValu
+aldi,smirnoff,false,auto: never flagged own at Dunnes or SuperValu
+aldi,stella artois,false,auto: never flagged own at Dunnes or SuperValu
+aldi,strepsils,false,auto: never flagged own at Dunnes or SuperValu
+aldi,strings and things,false,auto: never flagged own at Dunnes or SuperValu
+aldi,sure,false,auto: never flagged own at Dunnes or SuperValu
+aldi,swizzels,false,auto: never flagged own at Dunnes or SuperValu
+aldi,tayto,false,auto: never flagged own at Dunnes or SuperValu
+aldi,terrys,false,auto: never flagged own at Dunnes or SuperValu
+aldi,tunnocks,false,auto: never flagged own at Dunnes or SuperValu
+aldi,unibond,false,auto: never flagged own at Dunnes or SuperValu
+aldi,viva,false,auto: never flagged own at Dunnes or SuperValu
+aldi,walls,false,auto: never flagged own at Dunnes or SuperValu
+aldi,weetabix,false,auto: never flagged own at Dunnes or SuperValu
+aldi,whiskas,false,auto: never flagged own at Dunnes or SuperValu
+aldi,yoplait,false,auto: never flagged own at Dunnes or SuperValu
+tesco,paperchase,false,manual: third-party brand sold at Tesco (confirmed)
+tesco,slumberdown,false,manual: third-party brand sold at Tesco (confirmed)
+tesco,woodvale,false,manual: third-party brand sold at Tesco (confirmed)

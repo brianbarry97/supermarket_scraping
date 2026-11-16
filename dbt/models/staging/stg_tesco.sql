@@ -34,6 +34,13 @@ SELECT
     -- Superset of foodIcons: also carries organic certification marks that foodIcons misses
     list_transform(data.icons, lambda x: x.caption) AS certification_flags,
     data.details.nutritionalClaims AS nutritional_claims,
+    -- Tesco's own labels that do not say "Tesco" in the brand (Go Cook, Fred & Flo, ...) name Tesco as
+    -- returns or manufacturer address; int_tesco turns this into is_own_brand per brand
+    regexp_matches(
+        coalesce(to_json(data.returnTo)::VARCHAR, '') || ' '
+            || coalesce(array_to_string(data.manufacturer.addresses, ' '), ''),
+        '(?i)tesco (stores|ireland)'
+    ) AS has_tesco_address,
     data.media.defaultImage.url AS image_url,
     NOT (data.title IS NULL AND data.promotions[1].metaData.seo.afterDiscountPrice IS NOT NULL)
         AS is_product_available,
