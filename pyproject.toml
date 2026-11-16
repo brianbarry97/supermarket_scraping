@@ -55,7 +55,7 @@ ml = [
     "huggingface-hub>=1.19.0",
     "datasets>=5.0.0",
     "polars-distance>=0.5.3",
-   
+    "mlx-vlm>=0.7.12",
 ]
 
 agents = [
