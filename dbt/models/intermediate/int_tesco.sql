@@ -46,14 +46,18 @@ SELECT
     {{ price_per_unit_normalised('effective_price', 'unit_qty_normalised', 'unit_normalised') }}::DOUBLE AS price_per_unit_normalised,
     promotion_description::VARCHAR AS promotion_description,
     promotion_type::VARCHAR AS promotion_type,
-    promotion_qualities::VARCHAR[] AS promotion_qualities,
     promotion_start_date::DATE AS promotion_start_date,
     promotion_end_date::DATE AS promotion_end_date,
     CAST(NULL AS DATE) AS discount_start_date,
     CAST(NULL AS DATE) AS discount_end_date,
     array_to_string(
         list_filter(
-            list_transform(ingredients, lambda x: trim(regexp_replace(x, '<[^>]+>', '', 'g'))),
+            -- the list is the raw text split on commas, so the label ("<strong>INGREDIENTS:</strong> Water")
+            -- sits inside the first (or a later) element, together with HTML
+            list_transform(
+                ingredients,
+                lambda x: coalesce({{ strip_ingredients_label("regexp_replace(x, '<[^>]+>', '', 'g')") }}, '')
+            ),
             lambda x: length(x) > 0
         ),
         ', '
@@ -90,7 +94,6 @@ SELECT
     CAST(NULL AS BOOLEAN) AS is_dairy_free,
     CAST(NULL AS BOOLEAN) AS is_sugar_free,
     CAST(NULL AS BOOLEAN) AS has_no_added_sugar,
-    CAST(NULL AS BOOLEAN) AS is_diabetic_friendly,
     image_url::VARCHAR AS image_url,
     is_product_available::BOOLEAN AS is_product_available,
     scraped_date::DATE AS scraped_date

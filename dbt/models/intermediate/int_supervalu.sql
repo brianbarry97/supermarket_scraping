@@ -37,12 +37,11 @@ SELECT
     {{ price_per_unit_normalised('price', 'unit_qty_normalised', 'unit_normalised') }}::DOUBLE AS price_per_unit_normalised,
     promotion_description::VARCHAR AS promotion_description,
     promotion_type::VARCHAR AS promotion_type,
-    CAST(NULL AS VARCHAR[]) AS promotion_qualities,
     promotion_start_date::DATE AS promotion_start_date,
     promotion_end_date::DATE AS promotion_end_date,
     discount_start_date::DATE AS discount_start_date,
     discount_end_date::DATE AS discount_end_date,
-    ingredients::VARCHAR AS ingredients,
+    {{ strip_ingredients_label('ingredients') }}::VARCHAR AS ingredients,
     {{ allergens_from_json_map('allergy_advice', 'contains') }} AS contains_allergens,
     {{ allergens_from_json_map('allergy_advice', 'may_contain') }} AS may_contain_allergens,
     dietary_flags::VARCHAR[] AS dietary_flags,
@@ -73,7 +72,7 @@ SELECT
     )::BOOLEAN AS is_low_fat,
     list_contains(dietary_flags, 'Kosher')::BOOLEAN AS is_kosher,
     list_contains(dietary_flags, 'Halal')::BOOLEAN AS is_halal,
-    -- Dairy-free / sugar-free / diabetic attributes are shelved as categories that the taxonomy
+    -- Dairy-free / sugar-free attributes are shelved as categories that the taxonomy
     -- consolidation dissolves, so they are preserved here first. SuperValu-only.
     (
         coalesce(category_2 IN ('Lactose & Dairy Free', 'Dairy & Lactose Free'), false)
@@ -87,7 +86,6 @@ SELECT
         OR {{ has_flag('dietary_flags', 'No Sugar') }}
         OR {{ has_flag('dietary_flags', 'Low in sugar') }}
     )::BOOLEAN AS has_no_added_sugar,
-    {{ has_flag('dietary_ext', 'Suitable for Diabetics') }}::BOOLEAN AS is_diabetic_friendly,
     image_url::VARCHAR AS image_url,
     is_product_available::BOOLEAN AS is_product_available,
     scraped_date::DATE AS scraped_date

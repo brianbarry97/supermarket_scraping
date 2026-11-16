@@ -1,6 +1,6 @@
 unit_tests:
   - name: int_aldi_parses_size_price_and_placeholders
-    description: Pack size/unit parsed from text, display prices parsed, N/A ingredients nulled, unavailable products dropped.
+    description: Pack size/unit parsed from text, display prices parsed, N/A ingredients nulled, a leading Ingredients label stripped (not mid-text or "Ingredients per ..."), unavailable products dropped.
     model: int_aldi
     given:
       - input: ref('stg_aldi')
@@ -10,11 +10,21 @@ unit_tests:
           - {id: a4, supermarket: aldi, title: "Foil 20m", selling_size: "20m", price_display: "€2.00", is_sale: false, is_product_available: true}
           - {id: a5, supermarket: aldi, title: "Apples 6 pack", selling_size: "6 pack", price_display: "€3.00", is_sale: false, is_product_available: true}
           - {id: a6, supermarket: aldi, title: "20v Battery Charger", selling_size: "20v", price_display: "€15.00", is_sale: false, is_product_available: true}
+          - {id: a7, supermarket: aldi, title: "Choc", selling_size: "100g", price_display: "€1.00", is_sale: false, ingredients: "INGREDIENTS: Sugar, Cocoa", is_product_available: true}
+          - {id: a8, supermarket: aldi, title: "Choc 2", selling_size: "100g", price_display: "€1.00", is_sale: false, ingredients: "<b>Ingredients :</b>\u00a0Sugar", is_product_available: true}
+          - {id: a9, supermarket: aldi, title: "Caps", selling_size: "100g", price_display: "€1.00", is_sale: false, ingredients: "Ingredients per capsule - 5 billion cultures", is_product_available: true}
+          - {id: a10, supermarket: aldi, title: "Bare", selling_size: "100g", price_display: "€1.00", is_sale: false, ingredients: "Ingredients", is_product_available: true}
+          - {id: a11, supermarket: aldi, title: "Mid", selling_size: "100g", price_display: "€1.00", is_sale: false, ingredients: "Oats, Ingredients: Salt", is_product_available: true}
           - {id: a3, supermarket: aldi, title: "Gone", selling_size: "1kg", price_display: "€1.00", is_sale: false, is_product_available: false}
     expect:
       rows:
         - {id: a1, price: 1.99, was_price: 2.49, selling_size: 1.5, unit: l, unit_qty_normalised: 1.5, unit_normalised: l, price_per_unit_normalised: 1.33, is_discount: true, ingredients: null}
         - {id: a2, price: 3.0, selling_size: 200.0, unit: g, unit_qty_normalised: 0.2, unit_normalised: kg, price_per_unit_normalised: 15.0, is_discount: false, ingredients: Milk}
+        - {id: a7, is_discount: false, price: 1.0, selling_size: 100.0, unit: g, unit_qty_normalised: 0.1, unit_normalised: kg, price_per_unit_normalised: 10.0, ingredients: "Sugar, Cocoa"}
+        - {id: a8, is_discount: false, price: 1.0, selling_size: 100.0, unit: g, unit_qty_normalised: 0.1, unit_normalised: kg, price_per_unit_normalised: 10.0, ingredients: Sugar}
+        - {id: a9, is_discount: false, price: 1.0, selling_size: 100.0, unit: g, unit_qty_normalised: 0.1, unit_normalised: kg, price_per_unit_normalised: 10.0, ingredients: "Ingredients per capsule - 5 billion cultures"}
+        - {id: a10, is_discount: false, price: 1.0, selling_size: 100.0, unit: g, unit_qty_normalised: 0.1, unit_normalised: kg, price_per_unit_normalised: 10.0, ingredients: null}
+        - {id: a11, is_discount: false, price: 1.0, selling_size: 100.0, unit: g, unit_qty_normalised: 0.1, unit_normalised: kg, price_per_unit_normalised: 10.0, ingredients: "Oats, Ingredients: Salt"}
         - {id: a4, selling_size: 20.0, price: 2.0, is_discount: false, price_per_unit_normalised: 0.1, unit: m, unit_qty_normalised: 20.0, unit_normalised: m}
         - {id: a6, selling_size: 20.0, price: 15.0, is_discount: false, unit: v, unit_qty_normalised: 1.0, unit_normalised: each, price_per_unit_normalised: 15.0}
         - {id: a5, selling_size: 6.0, price: 3.0, is_discount: false, unit: pack, unit_qty_normalised: 6.0, unit_normalised: each, price_per_unit_normalised: 0.5}
@@ -41,13 +51,45 @@ unit_tests:
       - input: ref('stg_supervalu')
         format: sql
         rows: |
-          SELECT 'v1' AS id, 'supervalu' AS supermarket, 'Oat Drink Sugar Free' AS title, CAST(NULL AS VARCHAR) AS brand, CAST(1 AS DOUBLE) AS quantity, 'l' AS unit, CAST(NULL AS DOUBLE) AS unit_price, CAST(NULL AS DOUBLE) AS price, CAST(NULL AS DOUBLE) AS was_price, CAST(NULL AS DATE) AS promotion_start_date, CAST(NULL AS DATE) AS promotion_end_date, CAST(NULL AS DATE) AS discount_start_date, CAST(NULL AS DATE) AS discount_end_date, CAST(NULL AS VARCHAR) AS promotion_description, CAST(NULL AS VARCHAR) AS promotion_type, 'Free From' AS category_1, 'Free From' AS category_2, 'Dairy Free' AS category_3, CAST(NULL AS VARCHAR) AS category_4, CAST(NULL AS VARCHAR) AS item_description, CAST(NULL AS VARCHAR) AS ingredients, CAST('{"Milk": "Contains", "Egg": "May Contain, traces"}' AS JSON) AS allergy_advice, ['Gluten free', 'Organic', 'Halal'] AS dietary_flags, ['Suitable for Diabetics'] AS dietary_ext, CAST(NULL AS BOOLEAN) AS is_vegan, CAST(NULL AS BOOLEAN) AS is_vegetarian, CAST(NULL AS BOOLEAN) AS is_gluten_free, CAST(NULL AS DOUBLE) AS fat_per_100g, CAST(NULL AS VARCHAR) AS image_url, CAST(NULL AS BOOLEAN) AS is_product_available, CAST(NULL AS BOOLEAN) AS is_discount, CAST(NULL AS BOOLEAN) AS is_promotion, CAST(NULL AS BOOLEAN) AS is_own_brand, CAST(NULL AS DATE) AS scraped_date
+          SELECT 'v1' AS id, 'supervalu' AS supermarket, 'Oat Drink Sugar Free' AS title, CAST(NULL AS VARCHAR) AS brand, CAST(1 AS DOUBLE) AS quantity, 'l' AS unit, CAST(NULL AS DOUBLE) AS unit_price, CAST(NULL AS DOUBLE) AS price, CAST(NULL AS DOUBLE) AS was_price, CAST(NULL AS DATE) AS promotion_start_date, CAST(NULL AS DATE) AS promotion_end_date, CAST(NULL AS DATE) AS discount_start_date, CAST(NULL AS DATE) AS discount_end_date, CAST(NULL AS VARCHAR) AS promotion_description, CAST(NULL AS VARCHAR) AS promotion_type, 'Free From' AS category_1, 'Free From' AS category_2, 'Dairy Free' AS category_3, CAST(NULL AS VARCHAR) AS category_4, CAST(NULL AS VARCHAR) AS item_description, CAST(NULL AS VARCHAR) AS ingredients, CAST('{"Milk": "Contains", "Egg": "May Contain, traces"}' AS JSON) AS allergy_advice, ['Gluten free', 'Organic', 'Halal'] AS dietary_flags, ['Gluten Free'] AS dietary_ext, CAST(NULL AS BOOLEAN) AS is_vegan, CAST(NULL AS BOOLEAN) AS is_vegetarian, CAST(NULL AS BOOLEAN) AS is_gluten_free, CAST(NULL AS DOUBLE) AS fat_per_100g, CAST(NULL AS VARCHAR) AS image_url, CAST(NULL AS BOOLEAN) AS is_product_available, CAST(NULL AS BOOLEAN) AS is_discount, CAST(NULL AS BOOLEAN) AS is_promotion, CAST(NULL AS BOOLEAN) AS is_own_brand, CAST(NULL AS DATE) AS scraped_date
           UNION ALL
           SELECT 'v2' AS id, 'supervalu' AS supermarket, 'Chicken' AS title, CAST(NULL AS VARCHAR) AS brand, CAST(500 AS DOUBLE) AS quantity, 'g' AS unit, CAST(NULL AS DOUBLE) AS unit_price, CAST(NULL AS DOUBLE) AS price, CAST(NULL AS DOUBLE) AS was_price, CAST(NULL AS DATE) AS promotion_start_date, CAST(NULL AS DATE) AS promotion_end_date, CAST(NULL AS DATE) AS discount_start_date, CAST(NULL AS DATE) AS discount_end_date, CAST(NULL AS VARCHAR) AS promotion_description, CAST(NULL AS VARCHAR) AS promotion_type, 'Meat' AS category_1, CAST(NULL AS VARCHAR) AS category_2, CAST(NULL AS VARCHAR) AS category_3, CAST(NULL AS VARCHAR) AS category_4, CAST(NULL AS VARCHAR) AS item_description, CAST(NULL AS VARCHAR) AS ingredients, CAST(NULL AS JSON) AS allergy_advice, CAST(NULL AS VARCHAR[]) AS dietary_flags, CAST(NULL AS VARCHAR[]) AS dietary_ext, true AS is_vegan, CAST(NULL AS BOOLEAN) AS is_vegetarian, CAST(NULL AS BOOLEAN) AS is_gluten_free, CAST(2.5 AS DOUBLE) AS fat_per_100g, CAST(NULL AS VARCHAR) AS image_url, CAST(NULL AS BOOLEAN) AS is_product_available, CAST(NULL AS BOOLEAN) AS is_discount, CAST(NULL AS BOOLEAN) AS is_promotion, CAST(NULL AS BOOLEAN) AS is_own_brand, CAST(NULL AS DATE) AS scraped_date
     expect:
       rows:
-        - {id: v1, is_gluten_free: true, is_organic: true, is_halal: true, is_dairy_free: true, is_sugar_free: true, is_diabetic_friendly: true, is_vegan: false}
-        - {id: v2, is_vegan: true, is_gluten_free: false, is_organic: false, is_low_fat: true, is_dairy_free: false, is_sugar_free: false, is_diabetic_friendly: false, has_no_added_sugar: false, unit_normalised: kg, unit_qty_normalised: 0.5}
+        - {id: v1, is_gluten_free: true, is_organic: true, is_halal: true, is_dairy_free: true, is_sugar_free: true, is_vegan: false}
+        - {id: v2, is_vegan: true, is_gluten_free: false, is_organic: false, is_low_fat: true, is_dairy_free: false, is_sugar_free: false, has_no_added_sugar: false, unit_normalised: kg, unit_qty_normalised: 0.5}
+
+  - name: int_tesco_ingredients_label_stripped
+    description: The "INGREDIENTS:" label inside the HTML of a raw list element (first or later) is dropped, plain words are kept.
+    model: int_tesco
+    given:
+      - input: ref('stg_tesco')
+        format: sql
+        rows: |
+          SELECT
+            i.id, 'tesco' AS supermarket, CAST(NULL AS VARCHAR) AS title, CAST(NULL AS VARCHAR) AS brand,
+            CAST(1 AS FLOAT) AS quantity, 'sngl' AS unit, CAST(NULL AS DOUBLE) AS unit_price, CAST(NULL AS VARCHAR) AS unit_of_measure,
+            CAST(2.0 AS DOUBLE) AS price, CAST(NULL AS DOUBLE) AS promotion_price, CAST(NULL AS DOUBLE) AS price_before_discount,
+            CAST(NULL AS DOUBLE) AS price_after_discount, CAST(NULL AS DATE) AS promotion_start_date, CAST(NULL AS DATE) AS promotion_end_date,
+            CAST(NULL AS VARCHAR) AS promotion_description, CAST(NULL AS VARCHAR) AS promotion_type,
+            CAST(NULL AS VARCHAR) AS category_1, CAST(NULL AS VARCHAR) AS category_2, CAST(NULL AS VARCHAR) AS category_3, CAST(NULL AS VARCHAR) AS category_4,
+            CAST(NULL AS VARCHAR[]) AS item_description, i.ingredients,
+            CAST(NULL AS STRUCT("name" VARCHAR, "values" VARCHAR[], __typename VARCHAR)[]) AS allergen_info,
+            CAST(NULL AS VARCHAR[]) AS dietary_flags, CAST(NULL AS VARCHAR[]) AS certification_flags, CAST(NULL AS VARCHAR[]) AS nutritional_claims,
+            CAST(NULL AS VARCHAR) AS image_url, true AS is_product_available, false AS is_discount, false AS is_promotion,
+            CAST(NULL AS DATE) AS scraped_date
+          FROM (VALUES
+            ('t1', ['<p><strong>INGREDIENTS:</strong> Water', 'Vegetables (29%)', 'Durum <strong>Wheat</strong> Semolina', '<p> </p>']),
+            ('t2', ['<b>Ingredients :</b>', 'Flour', 'Sugar']),
+            ('t3', ['Salt', 'Ingredients:' || chr(160) || 'Pepper', 'Vegetables in varying proportions: Carrot']),
+            ('t4', ['Oats', 'Natural ingredients'])
+          ) AS i(id, ingredients)
+    expect:
+      rows:
+        - {id: t1, ingredients: "Water, Vegetables (29%), Durum Wheat Semolina"}
+        - {id: t2, ingredients: "Flour, Sugar"}
+        - {id: t3, ingredients: "Salt, Pepper, Vegetables in varying proportions: Carrot"}
+        - {id: t4, ingredients: "Oats, Natural ingredients"}
 
   - name: int_dunnes_parses_description_html
     description: Ingredients, allergen status (strictest wins on duplicates) and lifestyle tags are extracted from the description HTML.

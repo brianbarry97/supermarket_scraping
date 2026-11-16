@@ -60,8 +60,6 @@ models:
         description: "{{ doc('col_promotion_description') }}"
       - name: promotion_type
         description: "{{ doc('col_promotion_type') }}"
-      - name: promotion_qualities
-        description: "{{ doc('col_promotion_qualities') }}"
       - name: category_1
         description: "{{ doc('col_category_1') }}"
       - name: category_2

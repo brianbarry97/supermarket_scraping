@@ -81,7 +81,6 @@ SELECT
     {{ price_per_unit_normalised('price', 'unit_qty_normalised', 'unit_normalised') }}::DOUBLE AS price_per_unit_normalised,
     promotion_description::VARCHAR AS promotion_description,
     promotion_type::VARCHAR AS promotion_type,
-    CAST(NULL AS VARCHAR[]) AS promotion_qualities,
     promotion_start_date::DATE AS promotion_start_date,
     promotion_end_date::DATE AS promotion_end_date,
     discount_start_date::DATE AS discount_start_date,
@@ -111,7 +110,6 @@ SELECT
     CAST(NULL AS BOOLEAN) AS is_dairy_free,
     CAST(NULL AS BOOLEAN) AS is_sugar_free,
     CAST(NULL AS BOOLEAN) AS has_no_added_sugar,
-    CAST(NULL AS BOOLEAN) AS is_diabetic_friendly,
     image_url::VARCHAR AS image_url,
     is_product_available::BOOLEAN AS is_product_available,
     scraped_date::DATE AS scraped_date

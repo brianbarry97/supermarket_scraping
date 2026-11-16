@@ -35,7 +35,6 @@ SELECT
     is_dairy_free,
     is_sugar_free,
     has_no_added_sugar,
-    is_diabetic_friendly,
     price,
     was_price,
     is_discount,

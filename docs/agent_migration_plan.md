@@ -74,7 +74,7 @@ Facts re-verified in the brief: (1) true (absolute path, import-time loading, Su
 
 All in the main schema of `supermarket_data.db` (dev target).
 
-- `dim_product_search` (**to be built**, P3): one row per `(supermarket, id)` plus `product_key = supermarket || ':' || id`. Columns: `product_key, supermarket, id, title, title_cleaned, brand, is_own_brand, category_1..4, item_description, ingredients, contains_allergens VARCHAR[], may_contain_allergens VARCHAR[], dietary_flags VARCHAR[], is_vegan, is_vegetarian, is_gluten_free, is_organic, is_low_fat, is_kosher, is_halal, is_dairy_free, is_sugar_free, has_no_added_sugar, is_diabetic_friendly, price, was_price, is_discount, is_promotion, unit_price, price_per_unit_normalised, unit_normalised, image_url, is_product_available, scraped_date`. Source: `dbt/models/search/dim_product_search.sql`. It is the **current catalogue snapshot**: today `fct_product_listings` holds exactly one `scraped_date` (2026-10-29) with 4,586 aldi / 10,461 dunnes / 14,909 supervalu / 20,020 tesco rows; no duplicate `(supermarket, id)`; no NULL `price`.
+- `dim_product_search` (**to be built**, P3): one row per `(supermarket, id)` plus `product_key = supermarket || ':' || id`. Columns: `product_key, supermarket, id, title, title_cleaned, brand, is_own_brand, category_1..4, item_description, ingredients, contains_allergens VARCHAR[], may_contain_allergens VARCHAR[], dietary_flags VARCHAR[], is_vegan, is_vegetarian, is_gluten_free, is_organic, is_low_fat, is_kosher, is_halal, is_dairy_free, is_sugar_free, has_no_added_sugar, price, was_price, is_discount, is_promotion, unit_price, price_per_unit_normalised, unit_normalised, image_url, is_product_available, scraped_date`. Source: `dbt/models/search/dim_product_search.sql`. It is the **current catalogue snapshot**: today `fct_product_listings` holds exactly one `scraped_date` (2026-10-29) with 4,586 aldi / 10,461 dunnes / 14,909 supervalu / 20,020 tesco rows; no duplicate `(supermarket, id)`; no NULL `price`.
 - BM25: schema `fts_main_dim_product_search` plus table macro `bm25_search(query_text) -> (product_key, score)` (only matching rows; non-matching are dropped). Indexed fields: `title_cleaned, brand, category_1..4` (`dbt/macros/search_index.sql`). Ingredients are deliberately not indexed.
 - `emb_gemma2_text`: `supermarket, id, vector_index INTEGER, embedding FLOAT[768], content_key, embedded_at`. 50,042 rows, all `vector_index = 0`, unit norm (mean `array_inner_product(e,e)` = 1.00000003), so cosine equals dot product. Coverage gap: 473 `fct_product_listings` rows have no embedding and 539 embeddings have no listing (stale products). **Never inner-join the vectors to the candidate set** (rule R3).
 - `dim_embedding_specs`: `spec_id='268dad232ccc02bc'`, name `gemma2-text`, dim 768, n_items 50,042.
@@ -87,7 +87,7 @@ Dietary/allergen data quality (counts from `fct_product_listings`):
 |---|---|---|---|---|---|
 | aldi | 4,586 | **all NULL** (is_gluten_free NULL for every row) | 1,691 | 2,381 | 514 |
 | dunnes | 10,461 | filled | 5,165 | 588 | 4,708 |
-| supervalu | 14,909 | filled (only retailer with dairy_free/sugar_free/no_added_sugar/diabetic) | 6,851 | 1,035 | 7,023 |
+| supervalu | 14,909 | filled (only retailer with dairy_free/sugar_free/no_added_sugar) | 6,851 | 1,035 | 7,023 |
 | tesco | 20,020 | filled | 11,237 | 7,734 | 1,049 |
 
 Image hosts present in `image_url`: `digitalcontent.api.tesco.com`, `images.cdn.shop.supervalu.ie` (paths `zoom/`, `detail/`, and a few others), `images.cdn.dunnesstoresgrocery.com`, `dm.emea.cms.aldi.cx`; 83 rows have NULL image_url. No product-page URL field exists in `stg_*` (only image fields), so **only SuperValu has a known product URL pattern** (`https://shop.supervalu.ie/product/id-<id>`, agents.py:227).
@@ -206,7 +206,7 @@ search_products(
     max_price: float | None = None, min_price: float | None = None,
     vegan: bool = False, vegetarian: bool = False, gluten_free: bool = False,
     dairy_free: bool = False, organic: bool = False, low_fat: bool = False,
-    sugar_free: bool = False, no_added_sugar: bool = False, diabetic_friendly: bool = False,
+    sugar_free: bool = False, no_added_sugar: bool = False,
     kosher: bool = False, halal: bool = False,
     exclude_allergens: list[str] | None = None,    # e.g. ["milk", "nuts"]
     include_unknown_allergens: bool = False,

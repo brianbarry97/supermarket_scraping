@@ -113,9 +113,6 @@ models:
       - name: promotion_type
         description: "{{ doc('col_promotion_type') }}"
         data_type: varchar
-      - name: promotion_qualities
-        description: "{{ doc('col_promotion_qualities') }}"
-        data_type: varchar[]
       - name: promotion_start_date
         description: "{{ doc('col_promotion_start_date') }}"
         data_type: date
@@ -169,9 +166,6 @@ models:
         data_type: boolean
       - name: has_no_added_sugar
         description: "{{ doc('col_has_no_added_sugar') }}"
-        data_type: boolean
-      - name: is_diabetic_friendly
-        description: "{{ doc('col_is_diabetic_friendly') }}"
         data_type: boolean
       - name: image_url
         description: "{{ doc('col_image_url') }}"
@@ -297,9 +291,6 @@ models:
       - name: promotion_type
         description: "{{ doc('col_promotion_type') }}"
         data_type: varchar
-      - name: promotion_qualities
-        description: "{{ doc('col_promotion_qualities') }}"
-        data_type: varchar[]
       - name: promotion_start_date
         description: "{{ doc('col_promotion_start_date') }}"
         data_type: date
@@ -353,9 +344,6 @@ models:
         data_type: boolean
       - name: has_no_added_sugar
         description: "{{ doc('col_has_no_added_sugar') }}"
-        data_type: boolean
-      - name: is_diabetic_friendly
-        description: "{{ doc('col_is_diabetic_friendly') }}"
         data_type: boolean
       - name: image_url
         description: "{{ doc('col_image_url') }}"
@@ -481,9 +469,6 @@ models:
       - name: promotion_type
         description: "{{ doc('col_promotion_type') }}"
         data_type: varchar
-      - name: promotion_qualities
-        description: "{{ doc('col_promotion_qualities') }}"
-        data_type: varchar[]
       - name: promotion_start_date
         description: "{{ doc('col_promotion_start_date') }}"
         data_type: date
@@ -537,9 +522,6 @@ models:
         data_type: boolean
       - name: has_no_added_sugar
         description: "{{ doc('col_has_no_added_sugar') }}"
-        data_type: boolean
-      - name: is_diabetic_friendly
-        description: "{{ doc('col_is_diabetic_friendly') }}"
         data_type: boolean
       - name: image_url
         description: "{{ doc('col_image_url') }}"
@@ -665,9 +647,6 @@ models:
       - name: promotion_type
         description: "{{ doc('col_promotion_type') }}"
         data_type: varchar
-      - name: promotion_qualities
-        description: "{{ doc('col_promotion_qualities') }}"
-        data_type: varchar[]
       - name: promotion_start_date
         description: "{{ doc('col_promotion_start_date') }}"
         data_type: date
@@ -721,9 +700,6 @@ models:
         data_type: boolean
       - name: has_no_added_sugar
         description: "{{ doc('col_has_no_added_sugar') }}"
-        data_type: boolean
-      - name: is_diabetic_friendly
-        description: "{{ doc('col_is_diabetic_friendly') }}"
         data_type: boolean
       - name: image_url
         description: "{{ doc('col_image_url') }}"

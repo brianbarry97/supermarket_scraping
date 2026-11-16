@@ -23,7 +23,6 @@ SELECT
     {{ utc_to_local_date('data.promotions[1].endDate') }} AS promotion_end_date,
     data.promotions[1].description AS promotion_description,
     data.promotions[1].attributes[1] AS promotion_type,
-    data.promotions[1].qualities AS promotion_qualities,
     data.superDepartmentName AS category_1,
     data.departmentName AS category_2,
     data.aisleName AS category_3,

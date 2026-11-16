@@ -46,7 +46,6 @@
 
 {% docs col_promotion_type %}Retailer promotion type of the first promotion (e.g. BulkPromotion, BundlePromotion).{% enddocs %}
 
-{% docs col_promotion_qualities %}Tesco promotion quality tags (price_cut, multibuy, ...). NULL for other retailers.{% enddocs %}
 
 {% docs col_promotion_start_date %}First promotion start date, converted from UTC to Europe/Dublin.{% enddocs %}
 
@@ -84,7 +83,6 @@
 
 {% docs col_has_no_added_sugar %}Carries a no-added-sugar claim. SuperValu only; NULL elsewhere.{% enddocs %}
 
-{% docs col_is_diabetic_friendly %}Tagged suitable for diabetics. SuperValu only; NULL elsewhere.{% enddocs %}
 
 {% docs col_image_url %}Product image URL.{% enddocs %}
 
@@ -119,7 +117,7 @@
 {% docs dim_product_search %}
 One row per product (`supermarket`, `id`) from `fct_product_listings` (same run, same row count), shaped for search: text fields, dietary flags and basic price fields in one table. Keyword search uses a BM25 index (`fts_main_dim_product_search`) built over `title_cleaned`, `brand` and `category_1..4` by a post-hook on the local `dev`/`prod` targets only; it does not exist on the scheduled `batch` target. Vector search joins `emb_<spec>` / `fct_embeddings` on `(supermarket, id)` at query time; no embeddings are stored here.
 
-**Dietary flags: NULL means unknown, not false.** Coverage differs by retailer: SuperValu fills every flag; Tesco and Dunnes fill vegan, vegetarian, gluten free, organic, low fat, kosher and halal but not dairy free, sugar free, no added sugar or diabetic friendly; Aldi fills none and has ingredients for only about a quarter of its products. Filter with `flag IS TRUE` to require a positive signal. `flag IS NOT TRUE` mixes "not suitable" with "unknown"; never read it as "contains".
+**Dietary flags: NULL means unknown, not false.** Coverage differs by retailer: SuperValu fills every flag; Tesco and Dunnes fill vegan, vegetarian, gluten free, organic, low fat, kosher and halal but not dairy free, sugar free, or no added sugar; Aldi fills none and has ingredients for only about a quarter of its products. Filter with `flag IS TRUE` to require a positive signal. `flag IS NOT TRUE` mixes "not suitable" with "unknown"; never read it as "contains".
 {% enddocs %}
 
 {% docs search_product_key %}Surrogate key `supermarket || ':' || id`, unique per row. The single-column key the BM25 index needs (`match_bm25(product_key, ...)`) and the handle `bm25_search` returns.{% enddocs %}

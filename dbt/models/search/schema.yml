@@ -160,14 +160,6 @@ models:
               arguments:
                 values: [true, false]
                 quote: false
-      - name: is_diabetic_friendly
-        description: "{{ doc('col_is_diabetic_friendly') }} NULL means unknown, not false: filter with IS TRUE."
-        data_type: boolean
-        data_tests:
-          - accepted_values:
-              arguments:
-                values: [true, false]
-                quote: false
       - name: price
         description: "{{ doc('col_price') }}"
         data_type: double
