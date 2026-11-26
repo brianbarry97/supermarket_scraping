@@ -18,3 +18,9 @@ jobs:
       - run: uv run ruff check . --extend-exclude notebooks
       - run: uv run ruff format --check scraper_common ml_common ml tests aldi dunnes supervalu tesco lambda
       - run: uv run pytest -q
+        env:
+          # tests/test_dbt_infra.py opens a DuckDB s3 credential_chain secret even for local temp paths, which needs
+          # some AWS credentials to exist; dummy values satisfy it and are never used (no network access in these tests)
+          AWS_ACCESS_KEY_ID: ci
+          AWS_SECRET_ACCESS_KEY: ci
+          AWS_DEFAULT_REGION: eu-west-1
