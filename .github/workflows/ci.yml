@@ -3,7 +3,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches-ignore: ["local_implementation"]
+    branches-ignore: ["main"]
 
 permissions:
   contents: read

@@ -28,7 +28,7 @@ Line length is 100. Notebooks are excluded from pre-commit hooks.
 
 ## CI/CD
 
-Pushing to `local_implementation` automatically builds both Docker images, registers new AWS Batch job definitions, and deploys the Lambda. To push without triggering this, add `[skip ci]` anywhere in the commit message.
+`main` is the deploy branch (work happens on topic branches, merged by PR). Pushing to `main` automatically builds both Docker images, registers new AWS Batch job definitions, and deploys the Lambda. To push without triggering this, add `[skip ci]` anywhere in the commit message.
 
 ## Scraper Architecture
 

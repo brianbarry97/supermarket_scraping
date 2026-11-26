@@ -4563,6 +4563,8 @@ scraper = [
 ]
 test = [
     { name = "aiohttp" },
+    { name = "duckdb" },
+    { name = "numpy" },
     { name = "pillow" },
     { name = "pyarrow" },
     { name = "pytest" },
@@ -4642,6 +4644,8 @@ scraper = [
 ]
 test = [
     { name = "aiohttp", specifier = ">=3.13.3" },
+    { name = "duckdb", specifier = ">=2.0.0" },
+    { name = "numpy", specifier = ">=2.3.5" },
     { name = "pillow", specifier = ">=12.0.0" },
     { name = "pyarrow", specifier = ">=18.1.0" },
     { name = "pytest", specifier = ">=8.0" },

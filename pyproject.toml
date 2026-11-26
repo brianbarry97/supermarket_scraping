@@ -84,6 +84,8 @@ test = [
     "aiohttp>=3.13.3",  # tests/test_ml_images.py: local image server, fetcher
     "pillow>=12.0.0",
     "pyarrow>=18.1.0",
+    "numpy>=2.3.5",  # tests/test_ml_images.py
+    "duckdb>=2.0.0",  # tests/test_dbt_infra.py imports infra/dbt scripts that import duckdb
 ]
 
 

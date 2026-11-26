@@ -68,7 +68,7 @@ The project collects the public prices of grocery products from four Irish super
 
 ## 2. Repository map
 
-Root: `/Users/brianbarry/supermarket_scraping` (GitHub repo `MBMB54/supermarket_scraping`, per [docs/iam_setup.md](iam_setup.md)).
+Root: `/Users/brianbarry/supermarket_scraping` (GitHub repo `brianbarry97/supermarket_scraping`, per [docs/iam_setup.md](iam_setup.md)).
 
 | Path | What it is |
 |---|---|
@@ -91,7 +91,7 @@ Root: `/Users/brianbarry/supermarket_scraping` (GitHub repo `MBMB54/supermarket_
 | [infra/dbt/Dockerfile.dbt](../infra/dbt/Dockerfile.dbt) | Image `dbt-<sha>`: Python 3.12, dbt-core + dbt-duckdb, the `dbt/` project and `infra/dbt/*.py`. |
 | [pyproject.toml](../pyproject.toml), `uv.lock` | Dependencies in groups (section 3.1); `requires-python = "==3.14.*"`; ruff and pytest settings. |
 | [AGENTS.md](../AGENTS.md) / [CLAUDE.md](../CLAUDE.md) | Guidance for AI coding agents working in the repo. `CLAUDE.md` only imports `AGENTS.md`. |
-| `.github/workflows/` | `ci.yml` (lint + tests) and `aws.yml` (build/deploy on push to `local_implementation`). |
+| `.github/workflows/` | `ci.yml` (lint + tests) and `aws.yml` (build/deploy on push to `main`). |
 | `.agents/skills/` (`.claude/skills` symlinks to it) | Agent skills `check-jobs` and `submit-jobs`. `.claude/agents/code-reviewer.md` is a reviewer sub-agent that applies [REVIEW.md](REVIEW.md). |
 | `supermarket_data.db` | Local DuckDB file, 648 MB, git-ignored (`*.db`). The only place today where the marts and embeddings tables live. Section 6.2. |
 | `lk/`, `logs/` | `lk/` is an empty directory; `logs/` holds local dbt logs. Not part of the pipeline. |
@@ -106,7 +106,7 @@ Root: `/Users/brianbarry/supermarket_scraping` (GitHub repo `MBMB54/supermarket_
 The project uses [uv](https://docs.astral.sh/uv/) and Python 3.14. Always run scripts as `uv run python <script>`.
 
 ```bash
-git clone git@github.com:MBMB54/supermarket_scraping.git && cd supermarket_scraping
+git clone git@github.com:brianbarry97/supermarket_scraping.git && cd supermarket_scraping
 uv sync --group dev --group test          # linting + tests: enough for most work
 ```
 
@@ -324,7 +324,7 @@ One repository, `docker-images`, holding all images, distinguished by tag: `scra
 | `ie_supermarket_tesco429_smoketest` | Leftover from the 429 investigation (1 revision, 5400 s timeout). Not used by anything scheduled. |
 | `ocado_scraper_job_defintion` | Legacy (spelling as in AWS), 15 active revisions, from the earliest Ocado/Tesco scraper. Not used by the Lambda. Safe to deregister once confirmed unused (not done). |
 
-`aws.yml` registers a **new revision** of the two scraper job definitions (copying the previous one with only the image changed) on each push to `local_implementation`. The Lambda refers to job definitions by name, so it always gets the newest ACTIVE revision.
+`aws.yml` registers a **new revision** of the two scraper job definitions (copying the previous one with only the image changed) on each push to `main`. The Lambda refers to job definitions by name, so it always gets the newest ACTIVE revision.
 
 ### 5.5 Scheduling: EventBridge rule and the Lambda
 
@@ -398,9 +398,9 @@ The Scheduler `Input` format is now verified: the 14:30 UTC slot on 2026-10-27 f
 
 ### 5.9 CI/CD
 
-- [`.github/workflows/ci.yml`](../.github/workflows/ci.yml): on pull requests and on pushes to any branch **except** `local_implementation`: `uv sync --frozen --group dev --group test`, `ruff check . --extend-exclude notebooks`, `ruff format --check` on `scraper_common ml_common ml tests aldi dunnes supervalu tesco lambda`, then `pytest -q`.
-- [`.github/workflows/aws.yml`](../.github/workflows/aws.yml): on push to `local_implementation` (environment `production`, concurrency group `deploy`): build and push the ids and scraper images to ECR (tags `ids-<sha>`, `scraper-<sha>`), register new revisions of the two scraper job definitions, zip and deploy `lambda/` to `supermarket_batch_scheduler`; a second job `build-dbt-image` builds `dbt-<sha>` and, if the dbt job definitions exist, registers new revisions for them. **It does not run tests or lint**, and `ci.yml` skips this branch, so code pushed to `local_implementation` ships to AWS untested by CI. Run `uv run pytest -q` yourself first.
-- To push to `local_implementation` **without** deploying, put `[skip ci]` in the commit message. (Note that GitHub also then skips `ci.yml`.)
+- [`.github/workflows/ci.yml`](../.github/workflows/ci.yml): on pull requests and on pushes to any branch **except** `main`: `uv sync --frozen --group dev --group test`, `ruff check . --extend-exclude notebooks`, `ruff format --check` on `scraper_common ml_common ml tests aldi dunnes supervalu tesco lambda`, then `pytest -q`.
+- [`.github/workflows/aws.yml`](../.github/workflows/aws.yml): on push to `main` (environment `production`, concurrency group `deploy`): build and push the ids and scraper images to ECR (tags `ids-<sha>`, `scraper-<sha>`), register new revisions of the two scraper job definitions, zip and deploy `lambda/` to `supermarket_batch_scheduler`; a second job `build-dbt-image` builds `dbt-<sha>` and, if the dbt job definitions exist, registers new revisions for them. **It does not run tests or lint**, and `ci.yml` skips this branch, so code pushed to `main` ships to AWS untested by CI. Run `uv run pytest -q` yourself first.
+- To push to `main` **without** deploying, put `[skip ci]` in the commit message. (Note that GitHub also then skips `ci.yml`.)
 - Credentials are repository secrets `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` in environment `production` (long-lived keys).
 - [infra/dbt/github_workflow_dbt_ci.yml](../infra/dbt/github_workflow_dbt_ci.yml) is a draft (not under `.github/workflows/`): dbt parse + `tests/test_dbt_infra.py` on Python 3.12.
 
@@ -591,7 +591,7 @@ There are three independent layers: Python unit tests (9.1), the scraper's runti
 
 ### 9.1 Python tests (pytest)
 
-Run all: `uv run pytest -q` (config: `testpaths = ["tests"]`, `pythonpath = ["."]`). None need AWS or the network. CI runs them via [ci.yml](../.github/workflows/ci.yml) on pull requests and non-deploy branches (not on pushes to `local_implementation`).
+Run all: `uv run pytest -q` (config: `testpaths = ["tests"]`, `pythonpath = ["."]`). None need AWS or the network. CI runs them via [ci.yml](../.github/workflows/ci.yml) on pull requests and non-deploy branches (not on pushes to `main`).
 
 | File | Tests | What it covers |
 |---|---|---|
@@ -870,7 +870,7 @@ Only follow after reading the plan ([dbt_orchestration_plan.md](dbt_orchestratio
 
 | What | How |
 |---|---|
-| A bad scraper/Lambda deploy | Revert the commit on `local_implementation` and push (redeploys). Or re-register a previous job-definition revision: `aws batch describe-job-definitions --job-definition-name ie_supermarket_batch_job_definition --status ACTIVE --output json`, then register a copy pointing at the old image tag (every build is tagged `scraper-<sha>` in ECR). |
+| A bad scraper/Lambda deploy | Revert the commit on `main` and push (redeploys). Or re-register a previous job-definition revision: `aws batch describe-job-definitions --job-definition-name ie_supermarket_batch_job_definition --status ACTIVE --output json`, then register a copy pointing at the old image tag (every build is tagged `scraper-<sha>` in ECR). |
 | Bad dbt build on Batch | The catalog is only replaced after a green build, so a failed build changes nothing. After a bad *green* build: copy `dbt/state/archive/<earlier date>/catalog.ducklake` back to `dbt/state/catalog.ducklake` (valid for about 7 days because maintenance deletes older Parquet), and remove the `built/` markers for the bad days. |
 | Bad local build | Restore `supermarket_data.db` from `~/supermarket_backups/`. |
 | Raw data deleted or overwritten | The bucket is versioned: `aws s3api list-object-versions --bucket ie-supermarket-data --prefix <key>` and copy the old version back. Not possible after noncurrent versions expire (14 days once the lifecycle is applied). |

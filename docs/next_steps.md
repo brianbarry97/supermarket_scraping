@@ -89,9 +89,8 @@ stale-lock window, models downloaded at start vs an S3 mirror. If the dbt schedu
 embeddings models later, the dbt job role needs read access to `ml/*` and `tag:embeddings` must come out of
 the exclusion in `infra/dbt/run_dbt.py` (and `tests/test_dbt_infra.py`).
 
-**D3. Fast-forward `main`.** `main` is behind `local_implementation` by several commits (`git rev-list --count
-origin/main..origin/local_implementation`); `git push origin local_implementation:main` is a clean
-fast-forward (`main` is an ancestor). Push without `[skip ci]` only when you want CI to rebuild the images.
+**D3. `main` is the deploy branch (done 2026-11-26).** `local_implementation` was retired; both workflows now key off `main`
+(`aws.yml` deploys on push to `main`, `ci.yml` runs on every other branch and on pull requests). Work happens on topic branches.
 
 **D4. Small dbt choices.** Remove `prod` from `fts_targets` (it points at the same file as `dev`); compute
 `dim_embedding_specs.embedded_from/embedded_to` from current embeddings only (they span superseded ones today);

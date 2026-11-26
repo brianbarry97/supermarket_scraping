@@ -2,7 +2,7 @@ name: Build and push Docker images to ECR
 
 on:
   push:
-    branches: ["local_implementation"]
+    branches: ["main"]
 
 env:
   AWS_REGION: eu-west-1

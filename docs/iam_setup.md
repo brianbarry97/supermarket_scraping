@@ -25,7 +25,7 @@ resources were created or changed. Account `557690579730`, region `eu-west-1`.
 ## Target identities
 
 1. **GitHub Actions deploy role `supermarket-github-deploy`** (OIDC, no stored keys).
-   Trust: `github-deploy-trust.json` (limited to repo `MBMB54/supermarket_scraping`, environment
+   Trust: `github-deploy-trust.json` (limited to repo `brianbarry97/supermarket_scraping`, environment
    `production`, which `aws.yml` already uses). Permissions: `github-deploy-policy.json` (ECR push to
    `docker-images`, register Batch job definitions, PassRole for the two Batch roles, update the one
    Lambda).

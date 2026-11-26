@@ -214,7 +214,7 @@ from shared Fargate IPs (set `HF_TOKEN` as a Batch secret if it happens); `harri
 
 Run from the repo root with `AWS_REGION=eu-west-1`.
 
-1. **Review and apply the patch above, push to `local_implementation`.** Risk: low. CI builds and pushes
+1. **Review and apply the patch above, push to `main`.** Risk: low. CI builds and pushes
    `docker-images:embed-<sha>` (the first build of this Dockerfile has never been run: no Docker here;
    expect to fix a Dockerfile issue, e.g. a missing system library, on the first CI run). The job-definition step
    skips until the stack exists. Alternatively build locally with `--platform linux/amd64` and push by hand.
