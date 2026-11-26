@@ -20,6 +20,10 @@ unit_tests:
         format: sql
         rows: |
           SELECT CAST(NULL AS VARCHAR) AS supermarket, CAST(NULL AS VARCHAR) AS brand, CAST(NULL AS BOOLEAN) AS is_own_brand WHERE false
+      - input: ref('brand_aliases')
+        format: sql
+        rows: |
+          SELECT CAST(NULL AS VARCHAR) AS alias_key, CAST(NULL AS VARCHAR) AS canonical_key WHERE false
     expect:
       rows:
         - {id: a1, price: 1.99, was_price: 2.49, selling_size: 1.5, unit: l, unit_qty_normalised: 1.5, unit_normalised: l, price_per_unit_normalised: 1.33, is_discount: true, ingredients: null}
@@ -46,6 +50,10 @@ unit_tests:
         format: sql
         rows: |
           SELECT CAST(NULL AS VARCHAR) AS supermarket, CAST(NULL AS VARCHAR) AS brand, CAST(NULL AS BOOLEAN) AS is_own_brand WHERE false
+      - input: ref('brand_aliases')
+        format: sql
+        rows: |
+          SELECT CAST(NULL AS VARCHAR) AS alias_key, CAST(NULL AS VARCHAR) AS canonical_key WHERE false
     expect:
       rows:
         - {id: t1, price: 1.5, was_price: 2.0, unit_qty_normalised: 0.33, unit_normalised: l, price_per_unit_normalised: 4.55}
@@ -62,6 +70,10 @@ unit_tests:
           SELECT 'v1' AS id, 'supervalu' AS supermarket, 'Oat Drink Sugar Free' AS title, CAST(NULL AS VARCHAR) AS brand, CAST(1 AS DOUBLE) AS quantity, 'l' AS unit, CAST(NULL AS DOUBLE) AS unit_price, CAST(NULL AS DOUBLE) AS price, CAST(NULL AS DOUBLE) AS was_price, CAST(NULL AS DATE) AS promotion_start_date, CAST(NULL AS DATE) AS promotion_end_date, CAST(NULL AS DATE) AS discount_start_date, CAST(NULL AS DATE) AS discount_end_date, CAST(NULL AS VARCHAR) AS promotion_description, CAST(NULL AS VARCHAR) AS promotion_type, 'Free From' AS category_1, 'Free From' AS category_2, 'Dairy Free' AS category_3, CAST(NULL AS VARCHAR) AS category_4, CAST(NULL AS VARCHAR) AS item_description, CAST(NULL AS VARCHAR) AS ingredients, CAST('{"Milk": "Contains", "Egg": "May Contain, traces"}' AS JSON) AS allergy_advice, ['Gluten free', 'Organic', 'Halal'] AS dietary_flags, ['Gluten Free'] AS dietary_ext, CAST(NULL AS BOOLEAN) AS is_vegan, CAST(NULL AS BOOLEAN) AS is_vegetarian, CAST(NULL AS BOOLEAN) AS is_gluten_free, CAST(NULL AS DOUBLE) AS fat_per_100g, CAST(NULL AS VARCHAR) AS image_url, CAST(NULL AS BOOLEAN) AS is_product_available, CAST(NULL AS BOOLEAN) AS is_discount, CAST(NULL AS BOOLEAN) AS is_promotion, CAST(NULL AS BOOLEAN) AS is_own_brand, CAST(NULL AS DATE) AS scraped_date
           UNION ALL
           SELECT 'v2' AS id, 'supervalu' AS supermarket, 'Chicken' AS title, CAST(NULL AS VARCHAR) AS brand, CAST(500 AS DOUBLE) AS quantity, 'g' AS unit, CAST(NULL AS DOUBLE) AS unit_price, CAST(NULL AS DOUBLE) AS price, CAST(NULL AS DOUBLE) AS was_price, CAST(NULL AS DATE) AS promotion_start_date, CAST(NULL AS DATE) AS promotion_end_date, CAST(NULL AS DATE) AS discount_start_date, CAST(NULL AS DATE) AS discount_end_date, CAST(NULL AS VARCHAR) AS promotion_description, CAST(NULL AS VARCHAR) AS promotion_type, 'Meat' AS category_1, CAST(NULL AS VARCHAR) AS category_2, CAST(NULL AS VARCHAR) AS category_3, CAST(NULL AS VARCHAR) AS category_4, CAST(NULL AS VARCHAR) AS item_description, CAST(NULL AS VARCHAR) AS ingredients, CAST(NULL AS JSON) AS allergy_advice, CAST(NULL AS VARCHAR[]) AS dietary_flags, CAST(NULL AS VARCHAR[]) AS dietary_ext, true AS is_vegan, CAST(NULL AS BOOLEAN) AS is_vegetarian, CAST(NULL AS BOOLEAN) AS is_gluten_free, CAST(2.5 AS DOUBLE) AS fat_per_100g, CAST(NULL AS VARCHAR) AS image_url, CAST(NULL AS BOOLEAN) AS is_product_available, CAST(NULL AS BOOLEAN) AS is_discount, CAST(NULL AS BOOLEAN) AS is_promotion, CAST(NULL AS BOOLEAN) AS is_own_brand, CAST(NULL AS DATE) AS scraped_date
+      - input: ref('brand_aliases')
+        format: sql
+        rows: |
+          SELECT CAST(NULL AS VARCHAR) AS alias_key, CAST(NULL AS VARCHAR) AS canonical_key WHERE false
     expect:
       rows:
         - {id: v1, is_gluten_free: true, is_organic: true, is_halal: true, is_dairy_free: true, is_sugar_free: true, is_vegan: false}
@@ -97,6 +109,10 @@ unit_tests:
         format: sql
         rows: |
           SELECT CAST(NULL AS VARCHAR) AS supermarket, CAST(NULL AS VARCHAR) AS brand, CAST(NULL AS BOOLEAN) AS is_own_brand WHERE false
+      - input: ref('brand_aliases')
+        format: sql
+        rows: |
+          SELECT CAST(NULL AS VARCHAR) AS alias_key, CAST(NULL AS VARCHAR) AS canonical_key WHERE false
     expect:
       rows:
         - {id: t1, ingredients: "Water, Vegetables (29%), Durum Wheat Semolina"}
@@ -139,6 +155,10 @@ unit_tests:
         rows:
           - {supermarket: tesco, brand: paperchase, is_own_brand: false}
           - {supermarket: aldi, brand: cadbury, is_own_brand: true}
+      - input: ref('brand_aliases')
+        format: sql
+        rows: |
+          SELECT CAST(NULL AS VARCHAR) AS alias_key, CAST(NULL AS VARCHAR) AS canonical_key WHERE false
     expect:
       rows:
         - {id: t1, is_own_brand: true}
@@ -158,8 +178,8 @@ unit_tests:
 
   - name: int_aldi_own_brand_rules
     description: >
-      Every Aldi brand is own brand unless the own_brand_overrides seed lists it as third party; no brand is
-      unknown (NULL). A seed row for another retailer is ignored.
+      Every Aldi product is own brand unless the own_brand_overrides seed lists its brand as third party; a
+      product with no brand is own brand. A seed row for another retailer is ignored.
     model: int_aldi
     given:
       - input: ref('stg_aldi')
@@ -172,12 +192,80 @@ unit_tests:
         rows:
           - {supermarket: aldi, brand: kit kat, is_own_brand: false}
           - {supermarket: tesco, brand: cadbury, is_own_brand: false}
+      - input: ref('brand_aliases')
+        format: sql
+        rows: |
+          SELECT CAST(NULL AS VARCHAR) AS alias_key, CAST(NULL AS VARCHAR) AS canonical_key WHERE false
     expect:
       rows:
         - {id: o1, is_own_brand: true}
         - {id: o2, is_own_brand: false}
-        - {id: o3, is_own_brand: null}
+        - {id: o3, is_own_brand: true}
         - {id: o4, is_own_brand: true}
+
+  - name: int_tesco_brand_cleaning_and_key
+    description: >
+      brand is trimmed and whitespace-collapsed, brand_key has no spaces and follows the reviewed aliases, and
+      the own-brand override matches regardless of spacing.
+    model: int_tesco
+    given:
+      - input: ref('stg_tesco')
+        format: sql
+        rows: |
+          SELECT
+            i.id, 'tesco' AS supermarket, CAST(NULL AS VARCHAR) AS title, i.brand,
+            CAST(1 AS FLOAT) AS quantity, 'sngl' AS unit, CAST(NULL AS DOUBLE) AS unit_price, CAST(NULL AS VARCHAR) AS unit_of_measure,
+            CAST(2.0 AS DOUBLE) AS price, CAST(NULL AS DOUBLE) AS promotion_price, CAST(NULL AS DOUBLE) AS price_before_discount,
+            CAST(NULL AS DOUBLE) AS price_after_discount, CAST(NULL AS DATE) AS promotion_start_date, CAST(NULL AS DATE) AS promotion_end_date,
+            CAST(NULL AS VARCHAR) AS promotion_description, CAST(NULL AS VARCHAR) AS promotion_type,
+            CAST(NULL AS VARCHAR) AS category_1, CAST(NULL AS VARCHAR) AS category_2, CAST(NULL AS VARCHAR) AS category_3, CAST(NULL AS VARCHAR) AS category_4,
+            CAST(NULL AS VARCHAR[]) AS item_description, CAST(NULL AS VARCHAR[]) AS ingredients,
+            CAST(NULL AS STRUCT("name" VARCHAR, "values" VARCHAR[], __typename VARCHAR)[]) AS allergen_info,
+            CAST(NULL AS VARCHAR[]) AS dietary_flags, CAST(NULL AS VARCHAR[]) AS certification_flags, CAST(NULL AS VARCHAR[]) AS nutritional_claims,
+            false AS has_tesco_address,
+            CAST(NULL AS VARCHAR) AS image_url, true AS is_product_available, false AS is_discount, false AS is_promotion,
+            CAST(NULL AS DATE) AS scraped_date
+          FROM (VALUES
+            ('b1', 'Birds Eye'),
+            ('b2', 'BIRDS  EYE     '),
+            ('b3', 'Keoghs Crisps'),
+            ('b4', 'Paper   Chase '),
+            ('b5', 'Sure                ')
+          ) AS i(id, brand)
+      - input: ref('brand_aliases')
+        rows:
+          - {alias_key: keoghscrisps, canonical_key: keoghs}
+      - input: ref('own_brand_overrides')
+        rows:
+          - {supermarket: tesco, brand: paperchase, is_own_brand: false}
+    expect:
+      rows:
+        - {id: b1, brand: birds eye, brand_key: birdseye}
+        - {id: b2, brand: birds eye, brand_key: birdseye}
+        - {id: b3, brand: keoghs crisps, brand_key: keoghs}
+        - {id: b4, brand: paper chase, brand_key: paperchase, is_own_brand: false}
+        - {id: b5, brand: sure, brand_key: sure}
+
+  - name: int_aldi_brand_cleaning_and_key
+    description: Aldi brand spacing variants share one brand_key, a missing brand has no key, and the seed matches regardless of spacing.
+    model: int_aldi
+    given:
+      - input: ref('stg_aldi')
+        rows:
+          - {id: k1, supermarket: aldi, title: "Kit Kat 4 Finger", brand: "KIT KAT", selling_size: "41.5g", price_display: "€1.00", is_sale: false, is_product_available: true}
+          - {id: k2, supermarket: aldi, title: "Kitkat Chunky", brand: "KitKat  ", selling_size: "40g", price_display: "€1.00", is_sale: false, is_product_available: true}
+          - {id: k3, supermarket: aldi, title: "Paper Straws", selling_size: "50 Pack", price_display: "€1.00", is_sale: false, is_product_available: true}
+      - input: ref('own_brand_overrides')
+        rows:
+          - {supermarket: aldi, brand: kit kat, is_own_brand: false}
+      - input: ref('brand_aliases')
+        rows:
+          - {alias_key: x, canonical_key: y}
+    expect:
+      rows:
+        - {id: k1, brand: kit kat, brand_key: kitkat, is_own_brand: false}
+        - {id: k2, brand: kitkat, brand_key: kitkat, is_own_brand: false}
+        - {id: k3, brand: null, brand_key: null, is_own_brand: true}
 
   - name: int_dunnes_parses_description_html
     description: Ingredients, allergen status (strictest wins on duplicates) and lifestyle tags are extracted from the description HTML.
@@ -198,6 +286,10 @@ unit_tests:
             CAST(NULL AS BOOLEAN) AS is_organic, CAST(NULL AS BOOLEAN) AS is_low_fat, CAST(NULL AS DOUBLE) AS fat_per_100g,
             CAST(NULL AS VARCHAR) AS image_url, true AS is_product_available, false AS is_discount, false AS is_promotion,
             CAST(NULL AS BOOLEAN) AS is_own_brand, CURRENT_DATE AS scraped_date
+      - input: ref('brand_aliases')
+        format: sql
+        rows: |
+          SELECT CAST(NULL AS VARCHAR) AS alias_key, CAST(NULL AS VARCHAR) AS canonical_key WHERE false
     expect:
       rows:
         - {id: d1, ingredients: "Wheat Flour, Water", is_gluten_free: true, is_kosher: true, is_halal: false}
@@ -216,6 +308,10 @@ unit_tests:
         format: sql
         rows: |
           SELECT CAST(NULL AS VARCHAR) AS supermarket, CAST(NULL AS VARCHAR) AS brand, CAST(NULL AS BOOLEAN) AS is_own_brand WHERE false
+      - input: ref('brand_aliases')
+        format: sql
+        rows: |
+          SELECT CAST(NULL AS VARCHAR) AS alias_key, CAST(NULL AS VARCHAR) AS canonical_key WHERE false
     expect:
       rows:
         - {id: c1, unit_qty_normalised: 100.0, unit_normalised: each, price_per_unit_normalised: 0.015}
@@ -233,6 +329,10 @@ unit_tests:
           - {id: s2, supermarket: supervalu, title: "Bic Pens 10pk", quantity: 1, price: 3.0}
           - {id: s3, supermarket: supervalu, title: "Wipes 8 pack 48 piece", quantity: 384, price: 11.5}
           - {id: s4, supermarket: supervalu, title: "Foil", quantity: 4.5, unit: "m²", price: 1.0}
+      - input: ref('brand_aliases')
+        format: sql
+        rows: |
+          SELECT CAST(NULL AS VARCHAR) AS alias_key, CAST(NULL AS VARCHAR) AS canonical_key WHERE false
     expect:
       rows:
         - {id: s1, unit_qty_normalised: 12.0, unit_normalised: each, price_per_unit_normalised: 0.25}
@@ -252,6 +352,10 @@ unit_tests:
         format: sql
         rows: |
           SELECT CAST(NULL AS VARCHAR) AS supermarket, CAST(NULL AS VARCHAR) AS brand, CAST(NULL AS BOOLEAN) AS is_own_brand WHERE false
+      - input: ref('brand_aliases')
+        format: sql
+        rows: |
+          SELECT CAST(NULL AS VARCHAR) AS alias_key, CAST(NULL AS VARCHAR) AS canonical_key WHERE false
     expect:
       rows:
         - {id: u1, price: 2.0, was_price: 2.75, unit_price: 16.67, price_per_unit_normalised: 16.67}

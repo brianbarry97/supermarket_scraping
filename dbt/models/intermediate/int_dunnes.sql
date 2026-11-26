@@ -52,9 +52,14 @@ normalised AS (
     SELECT
         *,
         {{ normalize_text('title') }} AS title_norm,
+        {{ normalize_brand('brand') }} AS brand_norm,
         {{ unit_qty_normalised('unit', 'quantity', 'title_norm') }} AS unit_qty_normalised,
         {{ unit_normalised('unit') }} AS unit_normalised
     FROM parsed
+),
+
+keyed AS (
+    {{ with_brand_key('normalised') }}
 )
 
 SELECT
@@ -62,7 +67,8 @@ SELECT
     supermarket::VARCHAR AS supermarket,
     title_norm::VARCHAR AS title,
     {{ clean_title('title') }} AS title_cleaned,
-    {{ normalize_text('brand') }}::VARCHAR AS brand,
+    brand_norm::VARCHAR AS brand,
+    brand_key::VARCHAR AS brand_key,
     is_own_brand::BOOLEAN AS is_own_brand,
     item_description::VARCHAR AS item_description,
     {{ normalize_category('category_1') }}::VARCHAR AS category_1,
@@ -113,4 +119,4 @@ SELECT
     image_url::VARCHAR AS image_url,
     is_product_available::BOOLEAN AS is_product_available,
     scraped_date::DATE AS scraped_date
-FROM normalised
+FROM keyed

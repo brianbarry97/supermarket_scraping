@@ -8,7 +8,9 @@
 
 {% docs col_title_cleaned %}Normalised title with pack-size, weight and duration quantifiers removed (see macro clean_title); used for title embeddings.{% enddocs %}
 
-{% docs col_brand %}Normalised brand name.{% enddocs %}
+{% docs col_brand %}Normalised brand name: lowercase, accents and punctuation removed, whitespace trimmed and collapsed. Each retailer's own spelling, so "birds eye" and "birdseye" can both occur; use brand_key to compare brands across retailers.{% enddocs %}
+
+{% docs col_brand_key %}Cross-retailer brand identity: the brand with all spaces removed, then mapped through the reviewed seeds/brand_aliases (e.g. keoghs crisps -> keoghs). Equal brand_key means the same brand. NULL when the product has no brand.{% enddocs %}
 
 {% docs col_is_own_brand %}TRUE for the retailer's own-label products. Dunnes and SuperValu: the retailer's raw flag. Tesco: derived (brand is Tesco or F&F, or a Tesco-exclusive label recognised by the Tesco address in its returns/manufacturer details; see macro tesco_is_own_brand). Aldi: every brand unless the own_brand_overrides seed lists it as third party; NULL when the product has no brand. The seed overrides the rules for any retailer.{% enddocs %}
 

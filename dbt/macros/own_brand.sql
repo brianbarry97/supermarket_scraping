@@ -6,8 +6,8 @@
       returns/manufacturer address (stg_tesco.has_tesco_address): at least half of the brand's
       products in this run carry it, over at least 3 products so one-off imports do not count.
       brand_address_share and brand_address_n are window aggregates over the retailer's rows.
-    Aldi - aldi_is_own_brand: Aldi sells almost only own labels, so every brand is own unless the seed
-      lists it as third party (is_own_brand = false); a product with no brand is NULL (unknown). -#}
+    Aldi - aldi_is_own_brand: Aldi sells almost only own labels, so every product is own unless the seed lists its
+      brand as third party (is_own_brand = false); a product with no brand is own too. -#}
 {% macro tesco_is_own_brand(brand_norm, brand_address_share, brand_address_n, override) %}
 coalesce(
     {{ override }},
@@ -16,6 +16,6 @@ coalesce(
 )
 {% endmacro %}
 
-{% macro aldi_is_own_brand(brand_norm, override) %}
-CASE WHEN {{ brand_norm }} IS NULL OR {{ brand_norm }} = '' THEN NULL ELSE coalesce({{ override }}, true) END
+{% macro aldi_is_own_brand(override) %}
+coalesce({{ override }}, true)
 {% endmacro %}

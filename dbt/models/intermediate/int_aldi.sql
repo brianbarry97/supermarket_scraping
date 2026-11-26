@@ -19,7 +19,7 @@ normalised AS (
     SELECT
         *,
         {{ normalize_text('title') }} AS title_norm,
-        {{ normalize_text('brand') }} AS brand_norm,
+        {{ normalize_brand('brand') }} AS brand_norm,
         {{ unit_qty_normalised('unit_raw', 'selling_qty', 'title_norm', count_units=['each', 'pack', 'pk', 'sheet', 'sheets', 'slices', 'rolls', 'pair', 'pairs']) }} AS unit_qty_normalised,
         {{ unit_normalised('unit_raw') }} AS unit_normalised
     FROM parsed
@@ -27,11 +27,16 @@ normalised AS (
 
 -- seed row for this retailer and brand (seeds/own_brand_overrides) overrides the own-brand rule; joined in
 -- its own CTE so the seed's supermarket/brand columns cannot clash with the model's
+keyed AS (
+    {{ with_brand_key('normalised') }}
+),
+
 overridden AS (
-    SELECT normalised.*, brand_override.is_own_brand AS override_own_brand
-    FROM normalised
+    SELECT keyed.*, brand_override.is_own_brand AS override_own_brand
+    FROM keyed
     LEFT JOIN {{ ref('own_brand_overrides') }} AS brand_override
-        ON brand_override.supermarket = 'aldi' AND brand_override.brand = normalised.brand_norm
+        ON brand_override.supermarket = 'aldi'
+        AND replace(brand_override.brand, ' ', '') = replace(keyed.brand_norm, ' ', '')
 )
 
 SELECT
@@ -40,7 +45,8 @@ SELECT
     title_norm AS title,
     {{ clean_title('title') }} AS title_cleaned,
     brand_norm AS brand,
-    {{ aldi_is_own_brand('brand_norm', 'override_own_brand') }}::BOOLEAN AS is_own_brand,
+    brand_key AS brand_key,
+    {{ aldi_is_own_brand('override_own_brand') }}::BOOLEAN AS is_own_brand,
     description AS item_description,
     {{ normalize_category('category_1') }} AS category_1,
     {{ normalize_category('category_2') }} AS category_2,

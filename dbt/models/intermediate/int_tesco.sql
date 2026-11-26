@@ -6,9 +6,9 @@ normalised AS (
     SELECT
         *,
         {{ normalize_text('title') }} AS title_norm,
-        {{ normalize_text('brand') }} AS brand_norm,
-        avg(has_tesco_address::INT) OVER (PARTITION BY {{ normalize_text('brand') }}) AS brand_address_share,
-        count(*) FILTER (WHERE has_tesco_address) OVER (PARTITION BY {{ normalize_text('brand') }}) AS brand_address_n,
+        {{ normalize_brand('brand') }} AS brand_norm,
+        avg(has_tesco_address::INT) OVER (PARTITION BY {{ normalize_brand('brand') }}) AS brand_address_share,
+        count(*) FILTER (WHERE has_tesco_address) OVER (PARTITION BY {{ normalize_brand('brand') }}) AS brand_address_n,
         {{ unit_qty_normalised('unit', 'quantity', 'title_norm') }} AS unit_qty_normalised,
         {{ unit_normalised('unit') }} AS unit_normalised,
         -- price is the current effective price: only a price_cut discount lowers it. Multibuy
@@ -27,11 +27,16 @@ normalised AS (
 
 -- seed row for this retailer and brand (seeds/own_brand_overrides) overrides the own-brand rule; joined in
 -- its own CTE so the seed's supermarket/brand columns cannot clash with the model's
+keyed AS (
+    {{ with_brand_key('normalised') }}
+),
+
 overridden AS (
-    SELECT normalised.*, brand_override.is_own_brand AS override_own_brand
-    FROM normalised
+    SELECT keyed.*, brand_override.is_own_brand AS override_own_brand
+    FROM keyed
     LEFT JOIN {{ ref('own_brand_overrides') }} AS brand_override
-        ON brand_override.supermarket = 'tesco' AND brand_override.brand = normalised.brand_norm
+        ON brand_override.supermarket = 'tesco'
+        AND replace(brand_override.brand, ' ', '') = replace(keyed.brand_norm, ' ', '')
 )
 
 SELECT
@@ -40,6 +45,7 @@ SELECT
     title_norm::VARCHAR AS title,
     {{ clean_title('title') }} AS title_cleaned,
     brand_norm::VARCHAR AS brand,
+    brand_key::VARCHAR AS brand_key,
     {{ tesco_is_own_brand('brand_norm', 'brand_address_share', 'brand_address_n', 'override_own_brand') }}::BOOLEAN AS is_own_brand,
     item_description::VARCHAR AS item_description,
     {{ normalize_category('category_1') }}::VARCHAR AS category_1,

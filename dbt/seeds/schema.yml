@@ -94,3 +94,22 @@ seeds:
         data_tests: [not_null]
       - name: source
         description: Where the row came from (auto-derived from other retailers, or a manual decision).
+
+  - name: brand_aliases
+    description: >
+      Reviewed brand aliases: alias_key is mapped to canonical_key by the brand_key column of the int_* models. Keys are
+      brands with all spaces removed. One level only (a canonical key is never itself an alias); chains were resolved
+      when the seed was built.
+    columns:
+      - name: alias_key
+        description: Brand key (spaces removed) that is rewritten to canonical_key.
+        data_tests: [unique, not_null]
+      - name: canonical_key
+        description: The brand key the alias resolves to.
+        data_tests: [not_null]
+      - name: alias_brand
+        description: The alias as spelled by a retailer, for readability.
+      - name: canonical_brand
+        description: The canonical brand as spelled by a retailer, for readability.
+      - name: source
+        description: Where the row came from.

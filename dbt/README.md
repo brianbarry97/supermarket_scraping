@@ -70,7 +70,11 @@ The scheduled Batch job runs a plain `dbt build`; it needs `--exclude tag:embedd
 Dunnes and SuperValu expose it in the raw payload (`OwnBrand` / `own brand`, kept as is, noisy as it is). Tesco and Aldi do not, so `macros/own_brand.sql` derives it, and the `own_brand_overrides` seed (`supermarket, brand, is_own_brand, source`; brands normalised as in `int_*`) overrides the rules for any retailer:
 
 - **Tesco** (`tesco_is_own_brand`): brand is `tesco...` or `fandf...`, or a Tesco-exclusive label that does not say "Tesco" (Go Cook, Fred & Flo, Hearty Food Co, ...): at least half of the brand's products in the run, and at least three, name Tesco Stores/Ireland in `returnTo` or `manufacturer.addresses` (`stg_tesco.has_tesco_address`). Measured on the 2026-11-12 raw data: 4,783 products by name (795 of them F&F), 451 more by address across 28 brands. Third-party brands that sell through Tesco and carry its address (Paperchase, Slumberdown, Woodvale) are corrected with a seed row.
-- **Aldi** (`aldi_is_own_brand`): every brand is own unless the seed lists it as third party (`is_own_brand = false`); a product with no brand is NULL. The seed is seeded with the Aldi brands that Dunnes and SuperValu never flag as own (109 brands) and extended by hand.
+- **Aldi** (`aldi_is_own_brand`): every product is own unless the seed lists its brand as third party (`is_own_brand = false`); a product with no brand is own. The seed holds 156 Aldi third-party brands (auto-derived from Dunnes and SuperValu evidence, then reviewed by hand) and 3 Tesco corrections; seed brands match regardless of spacing.
+
+## Brand cleaning and `brand_key`
+
+`brand` is each retailer's own spelling, normalised and with whitespace trimmed and collapsed (`macros/brand.sql::normalize_brand`; some retailers pad brands with trailing spaces). `brand_key` is the cross-retailer identity of a brand: the brand with all spaces removed ("birds eye" and "birdseye" both give `birdseye`), then mapped through `seeds/brand_aliases` (`alias_key` to `canonical_key`, e.g. `keoghscrisps` to `keoghs`). Equal `brand_key` means the same brand; the display `brand` is never rewritten. The alias seed was built from reviewed candidate pairs: leading "the", plural/possessive, and one name starting with the other. Aliases are one level only (`assert_brand_aliases_not_chained`). A product with no brand has a NULL `brand_key`.
 
 ## Product search (`models/search/`, tag `search`)
 

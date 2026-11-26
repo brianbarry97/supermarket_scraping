@@ -15,6 +15,7 @@ SELECT
     title,
     title_cleaned,
     brand,
+    brand_key,
     is_own_brand,
     category_1,
     category_2,

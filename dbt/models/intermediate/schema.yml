@@ -39,6 +39,9 @@ models:
       - name: brand
         description: "{{ doc('col_brand') }}"
         data_type: varchar
+      - name: brand_key
+        description: "{{ doc('col_brand_key') }}"
+        data_type: varchar
       - name: is_own_brand
         description: "{{ doc('col_is_own_brand') }}"
         data_type: boolean
@@ -216,6 +219,9 @@ models:
         data_type: varchar
       - name: brand
         description: "{{ doc('col_brand') }}"
+        data_type: varchar
+      - name: brand_key
+        description: "{{ doc('col_brand_key') }}"
         data_type: varchar
       - name: is_own_brand
         description: "{{ doc('col_is_own_brand') }}"
@@ -395,6 +401,9 @@ models:
       - name: brand
         description: "{{ doc('col_brand') }}"
         data_type: varchar
+      - name: brand_key
+        description: "{{ doc('col_brand_key') }}"
+        data_type: varchar
       - name: is_own_brand
         description: "{{ doc('col_is_own_brand') }}"
         data_type: boolean
@@ -572,6 +581,9 @@ models:
         data_type: varchar
       - name: brand
         description: "{{ doc('col_brand') }}"
+        data_type: varchar
+      - name: brand_key
+        description: "{{ doc('col_brand_key') }}"
         data_type: varchar
       - name: is_own_brand
         description: "{{ doc('col_is_own_brand') }}"

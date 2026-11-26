@@ -1,111 +1,160 @@
 supermarket,brand,is_own_brand,source
-aldi,acti snack,false,auto: never flagged own at Dunnes or SuperValu
-aldi,alka seltzer,false,auto: never flagged own at Dunnes or SuperValu
-aldi,always,false,auto: never flagged own at Dunnes or SuperValu
-aldi,andrex,false,auto: never flagged own at Dunnes or SuperValu
-aldi,aptamil,false,auto: never flagged own at Dunnes or SuperValu
-aldi,atlantic treasures,false,auto: never flagged own at Dunnes or SuperValu
-aldi,babybel,false,auto: never flagged own at Dunnes or SuperValu
-aldi,ballymaloe,false,auto: never flagged own at Dunnes or SuperValu
-aldi,barrys tea,false,auto: never flagged own at Dunnes or SuperValu
-aldi,batchelors,false,auto: never flagged own at Dunnes or SuperValu
-aldi,bens original,false,auto: never flagged own at Dunnes or SuperValu
-aldi,benylin,false,auto: never flagged own at Dunnes or SuperValu
-aldi,boursin,false,auto: never flagged own at Dunnes or SuperValu
-aldi,brennans,false,auto: never flagged own at Dunnes or SuperValu
-aldi,budweiser,false,auto: never flagged own at Dunnes or SuperValu
-aldi,bulmers,false,auto: never flagged own at Dunnes or SuperValu
-aldi,bundaberg,false,auto: never flagged own at Dunnes or SuperValu
-aldi,bushmills,false,auto: never flagged own at Dunnes or SuperValu
-aldi,cadbury,false,auto: never flagged own at Dunnes or SuperValu
-aldi,calpol,false,auto: never flagged own at Dunnes or SuperValu
-aldi,carlsberg,false,auto: never flagged own at Dunnes or SuperValu
-aldi,chicago town,false,auto: never flagged own at Dunnes or SuperValu
-aldi,clonakilty,false,auto: never flagged own at Dunnes or SuperValu
-aldi,club,false,auto: never flagged own at Dunnes or SuperValu
-aldi,coca cola,false,auto: never flagged own at Dunnes or SuperValu
-aldi,colgate,false,auto: never flagged own at Dunnes or SuperValu
-aldi,connacht gold,false,auto: never flagged own at Dunnes or SuperValu
-aldi,cookie do,false,auto: never flagged own at Dunnes or SuperValu
-aldi,coolmore,false,auto: never flagged own at Dunnes or SuperValu
-aldi,coors,false,auto: never flagged own at Dunnes or SuperValu
-aldi,corona,false,auto: never flagged own at Dunnes or SuperValu
-aldi,disney,false,auto: never flagged own at Dunnes or SuperValu
-aldi,dolmio,false,auto: never flagged own at Dunnes or SuperValu
-aldi,doritos,false,auto: never flagged own at Dunnes or SuperValu
-aldi,dove,false,auto: never flagged own at Dunnes or SuperValu
-aldi,duracell,false,auto: never flagged own at Dunnes or SuperValu
-aldi,elbow grease,false,auto: never flagged own at Dunnes or SuperValu
-aldi,elmlea,false,auto: never flagged own at Dunnes or SuperValu
-aldi,extra,false,auto: never flagged own at Dunnes or SuperValu
-aldi,fairy,false,auto: never flagged own at Dunnes or SuperValu
-aldi,fini,false,auto: never flagged own at Dunnes or SuperValu
-aldi,flahavans,false,auto: never flagged own at Dunnes or SuperValu
-aldi,forest feast,false,auto: never flagged own at Dunnes or SuperValu
-aldi,fridge raiders,false,auto: never flagged own at Dunnes or SuperValu
-aldi,galaxy,false,auto: never flagged own at Dunnes or SuperValu
-aldi,garnier,false,auto: never flagged own at Dunnes or SuperValu
-aldi,gaviscon,false,auto: never flagged own at Dunnes or SuperValu
-aldi,glenilen farm,false,auto: never flagged own at Dunnes or SuperValu
-aldi,glenisk,false,auto: never flagged own at Dunnes or SuperValu
-aldi,gordons,false,auto: never flagged own at Dunnes or SuperValu
-aldi,green isle,false,auto: never flagged own at Dunnes or SuperValu
-aldi,guinness,false,auto: never flagged own at Dunnes or SuperValu
-aldi,haribo,false,auto: never flagged own at Dunnes or SuperValu
-aldi,heineken,false,auto: never flagged own at Dunnes or SuperValu
-aldi,heinz,false,auto: never flagged own at Dunnes or SuperValu
-aldi,hellmanns,false,auto: never flagged own at Dunnes or SuperValu
-aldi,irish yogurts,false,auto: never flagged own at Dunnes or SuperValu
-aldi,jacobs,false,auto: never flagged own at Dunnes or SuperValu
-aldi,jameson,false,auto: never flagged own at Dunnes or SuperValu
-aldi,kelloggs,false,auto: never flagged own at Dunnes or SuperValu
-aldi,kerry,false,auto: never flagged own at Dunnes or SuperValu
-aldi,kerrygold,false,auto: never flagged own at Dunnes or SuperValu
-aldi,kinder,false,auto: never flagged own at Dunnes or SuperValu
-aldi,king,false,auto: never flagged own at Dunnes or SuperValu
-aldi,knorr,false,auto: never flagged own at Dunnes or SuperValu
-aldi,lemsip,false,auto: never flagged own at Dunnes or SuperValu
-aldi,liga,false,auto: never flagged own at Dunnes or SuperValu
-aldi,lucozade,false,auto: never flagged own at Dunnes or SuperValu
-aldi,maggi,false,auto: never flagged own at Dunnes or SuperValu
-aldi,maltesers,false,auto: never flagged own at Dunnes or SuperValu
-aldi,maoam,false,auto: never flagged own at Dunnes or SuperValu
-aldi,mars,false,auto: never flagged own at Dunnes or SuperValu
-aldi,maxwell house,false,auto: never flagged own at Dunnes or SuperValu
-aldi,mcguigan,false,auto: never flagged own at Dunnes or SuperValu
-aldi,monster energy,false,auto: never flagged own at Dunnes or SuperValu
-aldi,morning fresh,false,auto: never flagged own at Dunnes or SuperValu
-aldi,nestle,false,auto: never flagged own at Dunnes or SuperValu
-aldi,nutella,false,auto: never flagged own at Dunnes or SuperValu
-aldi,oishii sushi,false,auto: never flagged own at Dunnes or SuperValu
-aldi,panadol,false,auto: never flagged own at Dunnes or SuperValu
-aldi,paw patrol,false,auto: never flagged own at Dunnes or SuperValu
-aldi,peppa pig,false,auto: never flagged own at Dunnes or SuperValu
-aldi,pepsi,false,auto: never flagged own at Dunnes or SuperValu
-aldi,pringles,false,auto: never flagged own at Dunnes or SuperValu
-aldi,quality street,false,auto: never flagged own at Dunnes or SuperValu
-aldi,red bull,false,auto: never flagged own at Dunnes or SuperValu
-aldi,rennie,false,auto: never flagged own at Dunnes or SuperValu
-aldi,santa rita,false,auto: never flagged own at Dunnes or SuperValu
-aldi,sensodyne,false,auto: never flagged own at Dunnes or SuperValu
-aldi,simply fruit,false,auto: never flagged own at Dunnes or SuperValu
-aldi,skinny whip,false,auto: never flagged own at Dunnes or SuperValu
-aldi,skittles,false,auto: never flagged own at Dunnes or SuperValu
-aldi,smirnoff,false,auto: never flagged own at Dunnes or SuperValu
-aldi,stella artois,false,auto: never flagged own at Dunnes or SuperValu
-aldi,strepsils,false,auto: never flagged own at Dunnes or SuperValu
-aldi,strings and things,false,auto: never flagged own at Dunnes or SuperValu
-aldi,sure,false,auto: never flagged own at Dunnes or SuperValu
-aldi,swizzels,false,auto: never flagged own at Dunnes or SuperValu
-aldi,tayto,false,auto: never flagged own at Dunnes or SuperValu
-aldi,terrys,false,auto: never flagged own at Dunnes or SuperValu
-aldi,tunnocks,false,auto: never flagged own at Dunnes or SuperValu
-aldi,unibond,false,auto: never flagged own at Dunnes or SuperValu
-aldi,viva,false,auto: never flagged own at Dunnes or SuperValu
-aldi,walls,false,auto: never flagged own at Dunnes or SuperValu
-aldi,weetabix,false,auto: never flagged own at Dunnes or SuperValu
-aldi,whiskas,false,auto: never flagged own at Dunnes or SuperValu
-aldi,yoplait,false,auto: never flagged own at Dunnes or SuperValu
-tesco,paperchase,false,manual: third-party brand sold at Tesco (confirmed)
-tesco,slumberdown,false,manual: third-party brand sold at Tesco (confirmed)
-tesco,woodvale,false,manual: third-party brand sold at Tesco (confirmed)
+aldi,7 up,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,acti snack,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,alka seltzer,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,alska,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,always,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,andrex,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,aptamil,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,atlantic treasures,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,babybel,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,ballymaloe,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,barrys tea,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,batchelors,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,bburago,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,bens original,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,benylin,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,bestway,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,birdseye,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,bluey,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,boursin,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,boyles gin,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,brennans,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,budweiser,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,bulmers,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,bundaberg,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,bushmills,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,cadbury,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,calpol,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,carlsberg,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,carousel,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,cauldron co,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,chicago town,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,clonakilty,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,club,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,coca cola,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,coca cola zero,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,colgate,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,connacht gold,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,cookie do,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,coolmore,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,coors,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,corona,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,disney,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,disney stitch,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,dolmio,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,doritos,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,dot brew,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,dove,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,duracell,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,ehrmann,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,elbow grease,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,elmlea,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,extra,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,fairy,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,fini,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,flahavans,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,forest feast,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,fridge raiders,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,fritt,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,funko,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,galaxy,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,garnier,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,gaviscon,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,glenilen farm,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,glenisk,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,goliath,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,gordons,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,green isle,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,guinness,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,haribo,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,harvest flame,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,healys farm,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,heineken,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,heinz,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,hellmanns,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,henkel,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,hinkler,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,hot wheels,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,hunky dorys,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,irish yogurts,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,jacobs,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,jameson,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,kelloggs,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,kerry,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,kerrygold,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,killowen,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,kinder,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,king,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,kit kat,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,knorr,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,lemsip,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,lexibook,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,liga,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,lucozade,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,maggi,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,maltesers,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,maoam,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,mars,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,maxwell house,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,mccambridge,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,mcguigan,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,melii,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,mini brands,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,monster energy,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,morning fresh,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,nestle,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,nutella,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,nutriquick,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,oishii sushi,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,original series,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,paladone,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,panadol,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,paw patrol,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,peppa pig,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,pepsi,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,pepsi max,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,play doh,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,pringles,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,professor puzzle,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,purewick,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,quality street,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,quick milk,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,ravensburger,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,red bull,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,rennie,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,santa rita,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,sensodyne,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,seriously,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,skinny whip,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,skittles,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,smirnoff,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,sokolow,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,splat planet,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,stella artois,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,storck,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,strepsils,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,strings and things,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,sure,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,swizzels,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,tayto,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,terrys,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,the native acai foods,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,thorntons,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,toro loco,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,toy mania,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,tunnocks,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,tyskie 1629,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,unibond,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,velo coffee roasters,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,viva,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,walls,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,weetabix,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,whiskas,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,willow warm,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,yoplait,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,zimpli kids,false,review 2026-11-26: third-party brand sold at Aldi
+aldi,zuru,false,review 2026-11-26: third-party brand sold at Aldi
+tesco,paperchase,false,review 2026-11-26: third-party brand sold at Tesco
+tesco,slumberdown,false,review 2026-11-26: third-party brand sold at Tesco
+tesco,woodvale,false,review 2026-11-26: third-party brand sold at Tesco
