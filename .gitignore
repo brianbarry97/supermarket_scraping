@@ -24,3 +24,4 @@ __pycache__/
 dbt/models/example/
 # dbt test fixtures are tiny sample inputs, not scraped data
 !dbt/tests/fixtures/**/*.jsonl
+matching_store/
