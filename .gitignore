@@ -3,6 +3,7 @@
 .ruff_cache
 .venv
 notebooks/*.json
+*.ipynb
 *.jsonl
 *.jsonl.gz
 *.db
@@ -19,6 +20,7 @@ __pycache__/
 *.csv
 !dbt/seeds/*.csv
 *.log
+logs/
 .vscode
 .dbt
 dbt/models/example/
