@@ -3,6 +3,24 @@ name: Build and push Docker images to ECR
 on:
   push:
     branches: ["main"]
+    # Deploy only when something baked into an image or the Lambda zip changes. Keep in sync with the COPY lines of
+    # Dockerfile.ids, Dockerfile.scraper, infra/dbt/Dockerfile.dbt and the lambda/ zip step below. A push that touches none
+    # of these (docs, ml_common, tests, notebooks, other infra) does not deploy; [skip ci] still skips everything.
+    paths:
+      - ".github/workflows/aws.yml"
+      - "Dockerfile.ids"
+      - "Dockerfile.scraper"
+      - ".dockerignore"
+      - "pyproject.toml"
+      - "uv.lock"
+      - "scraper_common/**"
+      - "aldi/**"
+      - "dunnes/**"
+      - "supervalu/**"
+      - "tesco/**"
+      - "lambda/**"
+      - "dbt/**"
+      - "infra/dbt/**"
 
 env:
   AWS_REGION: eu-west-1

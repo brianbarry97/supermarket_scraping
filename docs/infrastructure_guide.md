@@ -91,7 +91,7 @@ Root: `/Users/brianbarry/supermarket_scraping` (GitHub repo `brianbarry97/superm
 | [infra/dbt/Dockerfile.dbt](../infra/dbt/Dockerfile.dbt) | Image `dbt-<sha>`: Python 3.12, dbt-core + dbt-duckdb, the `dbt/` project and `infra/dbt/*.py`. |
 | [pyproject.toml](../pyproject.toml), `uv.lock` | Dependencies in groups (section 3.1); `requires-python = "==3.14.*"`; ruff and pytest settings. |
 | [AGENTS.md](../AGENTS.md) / [CLAUDE.md](../CLAUDE.md) | Guidance for AI coding agents working in the repo. `CLAUDE.md` only imports `AGENTS.md`. |
-| `.github/workflows/` | `ci.yml` (lint + tests) and `aws.yml` (build/deploy on push to `main`). |
+| `.github/workflows/` | `ci.yml` (lint + tests) and `aws.yml` (build/deploy on a push to `main` that changes a file baked into an image or the Lambda zip, see its `paths:` list). |
 | `.agents/skills/` (`.claude/skills` symlinks to it) | Agent skills `check-jobs` and `submit-jobs`. `.claude/agents/code-reviewer.md` is a reviewer sub-agent that applies [REVIEW.md](REVIEW.md). |
 | `supermarket_data.db` | Local DuckDB file, 648 MB, git-ignored (`*.db`). The only place today where the marts and embeddings tables live. Section 6.2. |
 | `lk/`, `logs/` | `lk/` is an empty directory; `logs/` holds local dbt logs. Not part of the pipeline. |
@@ -379,7 +379,7 @@ State as updated late on 2026-10-27 (the rollout is in progress; re-run the chec
 | Piece | Status | Evidence |
 |---|---|---|
 | Code (`infra/dbt/*.py`, `dbt/` changes, tests) | Committed and pushed (`8c3686c`, `d29a445`, `27fa673`, `bdc1d61`, `780ecb7`, `078b031`) | `git log` |
-| Image `docker-images:dbt-<sha>` | Built and pushed by the `build-dbt-image` job in `aws.yml` on every push | `aws ecr describe-images --repository-name docker-images` |
+| Image `docker-images:dbt-<sha>` | Built and pushed by the `build-dbt-image` job in `aws.yml` on every deploy (a push to `main` touching the `paths:` allowlist) | `aws ecr describe-images --repository-name docker-images` |
 | CloudFormation stack `supermarket-dbt-batch` | **Live** on the production prefixes since 2026-11-02 | `aws cloudformation describe-stacks --stack-name supermarket-dbt-batch` |
 | Stack parameters | `StatePrefix=dbt/state`, `LakeData=s3://ie-supermarket-data/ducklake/`, `ProcessedPrefix=s3://ie-supermarket-data/processed`, `ExecutionRoleArn` and `ScraperJobRoleArn` = `aws_batch_2`; pass the current image on each stack update, or CloudFormation re-registers the job definition with its original one | same command |
 | Job definitions `ie_supermarket_dbt_job_definition`, `ie_supermarket_compact_job_definition` | Registered; revision 2 uses the newest image (revision 1 was the first image, whose tests failed on missing fixtures) | `aws batch describe-job-definitions` |
@@ -399,7 +399,7 @@ The Scheduler `Input` format is now verified: the 14:30 UTC slot on 2026-10-27 f
 ### 5.9 CI/CD
 
 - [`.github/workflows/ci.yml`](../.github/workflows/ci.yml): on pull requests and on pushes to any branch **except** `main`: `uv sync --frozen --group dev --group test`, `ruff check . --extend-exclude notebooks`, `ruff format --check` on `scraper_common ml_common ml tests aldi dunnes supervalu tesco lambda`, then `pytest -q`.
-- [`.github/workflows/aws.yml`](../.github/workflows/aws.yml): on push to `main` (environment `production`, concurrency group `deploy`): build and push the ids and scraper images to ECR (tags `ids-<sha>`, `scraper-<sha>`), register new revisions of the two scraper job definitions, zip and deploy `lambda/` to `supermarket_batch_scheduler`; a second job `build-dbt-image` builds `dbt-<sha>` and, if the dbt job definitions exist, registers new revisions for them. **It does not run tests or lint**, and `ci.yml` skips this branch, so code pushed to `main` ships to AWS untested by CI. Run `uv run pytest -q` yourself first.
+- [`.github/workflows/aws.yml`](../.github/workflows/aws.yml): on a push to `main` that touches the `paths:` allowlist (files copied into the images or the Lambda zip; keep it in sync with the Dockerfiles; environment `production`, concurrency group `deploy`): build and push the ids and scraper images to ECR (tags `ids-<sha>`, `scraper-<sha>`), register new revisions of the two scraper job definitions, zip and deploy `lambda/` to `supermarket_batch_scheduler`; a second job `build-dbt-image` builds `dbt-<sha>` and, if the dbt job definitions exist, registers new revisions for them. **It does not run tests or lint**, and `ci.yml` skips this branch, so code pushed to `main` ships to AWS untested by CI. Run `uv run pytest -q` yourself first.
 - To push to `main` **without** deploying, put `[skip ci]` in the commit message. (Note that GitHub also then skips `ci.yml`.)
 - Credentials are repository secrets `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` in environment `production` (long-lived keys).
 - [infra/dbt/github_workflow_dbt_ci.yml](../infra/dbt/github_workflow_dbt_ci.yml) is a draft (not under `.github/workflows/`): dbt parse + `tests/test_dbt_infra.py` on Python 3.12.
